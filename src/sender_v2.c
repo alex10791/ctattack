@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 //#include <time.h>
-//#include <inttypes.h>
 
 #include "ctattack.h"
 
@@ -16,34 +15,36 @@ int main(int argc, char* argv[]) {
 	//int x = 0;
 	//int tt = 0;
 
-	B = (char*)malloc(b);
-
-	printf("&B\t:\t%p\n", B);
-	printPtr2bin((void *)B);
-	
-	//printf("&B\t:\t0x%0.16lx\n", (long int)B);
-	//printf("&B\t:\t%" PRIXPTR "\n", (uintptr_t)B);
+	volatile char* B_ext;
+	//B = (char*)malloc(b);
+	B_ext = (char*)malloc(2*b);
+	B = (char *) (((unsigned long int)B_ext & (~(unsigned long int)CACHE_L3_SIZE_MASK)) + CACHE_L3_SIZE);
 
 	printf("ROBOSTNESS_LOOP : %d\n", (int)ROBOSTNESS_LOOP);
 
+	while(1) {
+		for (int i = 0; i < b; i+=CACHE_L3_SET_OFFSET) {
+			B[i+CACHE_LINE] = 1;
+		}
+	}
 
 	printf("Sending 1\n");
 	for (int k = 0; k < ROBOSTNESS_LOOP; ++k) {
-		for (int i = 0; i < b; i+=CACHE_LINE) {
+		for (int i = 0; i < b; i+=CACHE_L3_SET_OFFSET) {
 			B[i] = 1;
 		}
 	}
 
 	printf("Sending 1\n");
 	for (int k = 0; k < ROBOSTNESS_LOOP; ++k) {
-		for (int i = 0; i < b; i+=CACHE_LINE) {
+		for (int i = 0; i < b; i+=CACHE_L3_SET_OFFSET) {
 			B[i] = 1;
 		}
 	}
 
 	printf("Sending 0\n");
 	for (int k = 0; k < ROBOSTNESS_LOOP; ++k) {
-		for (int i = 0; i < b; i+=CACHE_LINE) {
+		for (int i = 0; i < b; i+=CACHE_L3_SET_OFFSET) {
 			//B[i] = 0;
 			for(int j = 0; j < STALL_TIME; ++j);
 		}
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]) {
 
 	printf("Sending 0\n");
 	for (int k = 0; k < ROBOSTNESS_LOOP; ++k) {
-		for (int i = 0; i < b; i+=CACHE_LINE) {
+		for (int i = 0; i < b; i+=CACHE_L3_SET_OFFSET) {
 			//B[i] = 1;
 			for(int j = 0; j < STALL_TIME; ++j);
 		}
@@ -59,7 +60,7 @@ int main(int argc, char* argv[]) {
 
 	printf("Sending 1\n");
 	for (int k = 0; k < ROBOSTNESS_LOOP; ++k) {
-		for (int i = 0; i < b; i+=CACHE_LINE) {
+		for (int i = 0; i < b; i+=CACHE_L3_SET_OFFSET) {
 			B[i] = 1;
 		}
 	}
@@ -76,7 +77,7 @@ int main(int argc, char* argv[]) {
 
 
 
-	free((void *)B);
+	free((void *)B_ext);
 
 	return 0;
 }
