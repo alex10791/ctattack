@@ -1,6 +1,6 @@
 bin/*
 asm/*
-openssl1_0_1f
+openssl1_0_1f/*
 !bin/.keep
 !asm/.keep
 !openssl1_0_1f/.keep
