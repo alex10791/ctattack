@@ -20,6 +20,9 @@ TARGET = main
 
 
 
+detect_t_tables: src/detect_t_tables.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/detect_t_tables src/detect_t_tables.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
 aes_client: src/aes_client.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/aes_client src/aes_client.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
@@ -56,8 +59,8 @@ receiver_v2: src/receiver_v2.c src/ctattack.c
 
 all: $(TARGET)
 
-$(TARGET): src/$(TARGET).c src/ctattack.c
-	$(CC) $(CFLAGS) -o bin/$(TARGET) src/$(TARGET).c src/ctattack.c -O0 $(CHEADER_DIR)
+#$(TARGET): src/$(TARGET).c src/ctattack.c
+#	$(CC) $(CFLAGS) -o bin/$(TARGET) src/$(TARGET).c src/ctattack.c -O0 $(CHEADER_DIR)
 
 #bin/main: src/$(TARGET).cpp 	# this is not working, how to make bin/main depend on src/$(TARGET)
 
