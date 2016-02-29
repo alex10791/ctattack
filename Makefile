@@ -7,7 +7,7 @@ CC = gcc
 # compiler flags:
 #  -g    adds debugging information to the executable file
 #  -Wall turns on most, but not all, compiler warnings
-CFLAGS  = -Wall
+CFLAGS  = -Wall -g
 CLIBDIR = -L /usr/local/ssl/lib 
 #-L ~/Documents/github/ctattack/openssl1_0_1f/ -L /usr/local/Cellar/cryptopp/5.6.3_1/lib/
 CHEADER_DIR = -I src/include/  -I /usr/local/ssl/include/
@@ -19,9 +19,11 @@ CLIBS   = -lcrypto
 TARGET = main
 
 
-
 detect_t_tables: src/detect_t_tables.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/detect_t_tables src/detect_t_tables.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
+hugepage_attempt1: src/hugepage_attempt1.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/hugepage_attempt1 src/hugepage_attempt1.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
 aes_client: src/aes_client.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/aes_client src/aes_client.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
@@ -73,7 +75,7 @@ debug: src/$(TARGET).c src/ctattack.c
 masm_intel: src/$(TARGET).c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/$(TARGET) $(TARGET).c src/ctattack.c -O0 -masm=intel $(CHEADER_DIR)
 
-run: bin/$(TARGET)
+run: bin/$(TARGET) 
 	./bin/$(TARGET) $(ARGS)
 
 clean:

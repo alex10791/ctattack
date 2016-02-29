@@ -52,6 +52,12 @@
  * 
  */
 
+
+#define KB(x) x*1024
+#define MB(x) x*1024*1024
+//#define GB(x) x*1024*1024*1024
+
+
 #define ROBOSTNESS_LOOP 200 //1000000000
 #define CACHE_L3_THRESHOLD 400000 //800000
 
