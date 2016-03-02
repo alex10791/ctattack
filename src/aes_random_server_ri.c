@@ -18,12 +18,18 @@
 #include <stdlib.h> 
 #include <string.h>
 #include <time.h>
-#include <openssl/aes.h>
+//#include <openssl/aes.h>
+#include "rijndael-alg-fst.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#define VERBOSE
+#include <sys/mman.h>
+#include "ctattack.h"
+#define MAP_HUGE_2MB (21 << MAP_HUGE_SHIFT)
+
+
+//#define VERBOSE
 //#define TOUCH
 #define RESPOND_WITH_BINARY
 #define AES_BLOCK_SIZE_BYTES 16
@@ -88,6 +94,15 @@ int main(int argc, char* argv[])
     
     unsigned char enc_out[AES_BLOCK_SIZE_BYTES];
 
+    volatile unsigned long int x = 0;
+    size_t mem_length = (size_t)CACHE_L3_SIZE; // 4MB : 10000 00000000 00000000
+    volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGE_2MB, -1, 0);
+    B = malloc((int)mem_length);
+    volatile char *B_off = B + (0x403a40 & 0xFFF);
+    printf("%p\n", B);
+    printPtr2bin((void*)B);
+    
+
     while ((new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c))) {
 
         unsigned char *text;
@@ -103,12 +118,33 @@ int main(int argc, char* argv[])
             text[i] = 'A';
         }
 
+/*
+        printf("KEY : ");
+        for (int i = 0; i < 32; ++i) {
+            printf("%x:", key[i]);
+        }
+        printf("\nKEY : ");
+        for (int i = 0; i < 32; ++i) {
+            printf("%x:", key[31-i]);
+        }
+*/
+        u32 enc_key[16];
 
-        AES_KEY enc_key;
+        ////rijndaelKeySetupEnc(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBits);
+        rijndaelKeySetupEnc(enc_key, (const u8*) key, AES_BLOCK_SIZE_BITS);
+        ////AES_set_encrypt_key(key, AES_BLOCK_SIZE_BITS, &enc_key);
+        ////rijndaelEncrypt(const u32 rk[/*4*(Nr + 1)*/], int Nr, const u8 pt[16], u8 ct[16]);
+        rijndaelEncrypt(enc_key, 10, text, enc_out);
+        ////AES_encrypt(text, enc_out, &enc_key);
 
-        AES_set_encrypt_key(key, AES_BLOCK_SIZE_BITS, &enc_key);
-        AES_encrypt(text, enc_out, &enc_key);
-
+        //for (int i = 0; B_off+i < B+(int)mem_length; i+=CACHE_LINE) {
+          //  x += B_off[i];      // Takes less time for reload without CONNECT
+            //B_off[i] = 1;     .. Takes more time for reload without CONNECT
+        //}
+        for (int i = 0; B+i < B+(int)mem_length; i+=CACHE_LINE) {
+            x = B[i];          // Takes less time for reload without CONNECT
+            //B[i] = i;     // Takes more time for reload without CONNECT
+        }
 
 #ifdef VERBOSE 
         //char *message;

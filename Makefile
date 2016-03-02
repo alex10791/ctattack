@@ -10,7 +10,7 @@ CC = gcc
 CFLAGS  = -Wall -g
 CLIBDIR = -L /usr/local/ssl/lib 
 #-L ~/Documents/github/ctattack/openssl1_0_1f/ -L /usr/local/Cellar/cryptopp/5.6.3_1/lib/
-CHEADER_DIR = -I src/include/  -I /usr/local/ssl/include/
+CHEADER_DIR = -I src/include/ -I /usr/local/ssl/include/ -I openssl_aes_ref_impl/
 # -I ~/Documents/github/ctattack/openssl1_0_1f/crypto -I ~/Documents/github/ctattack/openssl1_0_1f/include/
 CLIBS   = -lcrypto
 #-lcryptopp
@@ -18,6 +18,9 @@ CLIBS   = -lcrypto
 # the build target executable:
 TARGET = main
 
+
+cachemon_v1: src/cachemon_v1.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cachemon_v1 src/cachemon_v1.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
 detect_t_tables: src/detect_t_tables.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/detect_t_tables src/detect_t_tables.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
@@ -30,6 +33,19 @@ aes_client: src/aes_client.c src/ctattack.c
 
 aes_server: src/aes_server.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/aes_server src/aes_server.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
+
+
+
+
+
+aes_random_server_ri: src/aes_random_server_ri.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
+	$(CC) $(CFLAGS) -o bin/aes_random_server_ri src/aes_random_server_ri.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
+
+
+
+
 
 aes_random_server: src/aes_random_server.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/aes_random_server src/aes_random_server.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)

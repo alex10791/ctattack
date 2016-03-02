@@ -25,6 +25,7 @@
  */
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "rijndael-alg-fst.h"
 
@@ -852,6 +853,15 @@ int rijndaelKeySetupDec(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBit
 }
 
 void rijndaelEncrypt(const u32 rk[/*4*(Nr + 1)*/], int Nr, const u8 pt[16], u8 ct[16]) {
+
+/*
+    printf("Te0\t%p\t\n", Te0);
+    printf("Te1\t%p\t\n", Te1);
+    printf("Te2\t%p\t\n", Te2);
+    printf("Te3\t%p\t\n", Te3);
+    printf("Te4\t%p\t\n", Te4);
+*/
+    
 	u32 s0, s1, s2, s3, t0, t1, t2, t3;
 #ifndef FULL_UNROLL
     int r;
