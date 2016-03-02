@@ -8,7 +8,7 @@
 #include <sys/mman.h>
 #include "ctattack.h"
 
-#define CONNECT
+//#define CONNECT
 
 #define AVERAGE_REPS 100
 #define MAP_HUGE_2MB (21 << MAP_HUGE_SHIFT)
@@ -57,6 +57,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 
 
     size_t mem_length = (size_t)CACHE_L3_SIZE;  //3*1024*1024; // 4MB : 10000 00000000 00000000
+    volatile char *B, *C;
 //    volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGE_2MB, -1, 0);
 //    volatile char *B_off = B + (0x403a40 & 0xFFF);
     
@@ -104,15 +105,15 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     end = timestamp();
     printf("Load2\t:\t%.8d cycles\n", end-begin);
 
-
-    begin = timestamp();
-    for (int i = 0; i < (int)mem_length; i+=CACHE_LINE) {
-        x += C[i];      // Takes less time for reload without CONNECT
-        //C[i] = 1;     // Takes more time for reload without CONNECT
+    for (int j = 0; j < 2; ++j) {
+        begin = timestamp();
+        for (int i = 0; i < (int)mem_length; i+=CACHE_LINE) {
+            x += C[i];      // Takes less time for reload without CONNECT
+            //C[i] = 1;     // Takes more time for reload without CONNECT
+        }
+        end = timestamp();
+        printf("Victim\t:\t%.8d cycles\n", end-begin);
     }
-    end = timestamp();
-    printf("Victim\t:\t%.8d cycles\n", end-begin);
-
     begin = timestamp();
     for (int i = 0; i < (int)mem_length; i+=CACHE_LINE) {
         x += B[i];      // Takes less time for reload without CONNECT
