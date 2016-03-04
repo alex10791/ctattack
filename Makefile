@@ -12,12 +12,16 @@ CLIBDIR = -L /usr/local/ssl/lib
 #-L ~/Documents/github/ctattack/openssl1_0_1f/ -L /usr/local/Cellar/cryptopp/5.6.3_1/lib/
 CHEADER_DIR = -I src/include/ -I /usr/local/ssl/include/ -I openssl_aes_ref_impl/
 # -I ~/Documents/github/ctattack/openssl1_0_1f/crypto -I ~/Documents/github/ctattack/openssl1_0_1f/include/
-CLIBS   = -lcrypto
+#CLIBS   = -lcrypto
 #-lcryptopp
 
 # the build target executable:
 TARGET = main
 
+
+
+cache_timing_tests: src/cache_timing_tests.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cache_timing_tests src/cache_timing_tests.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
 cachemon_v1: src/cachemon_v1.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cachemon_v1 src/cachemon_v1.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)

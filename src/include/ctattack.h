@@ -3,6 +3,14 @@
 
 #include <stdio.h>
 
+// only one should be left uncommented
+//#define MY_MACBOOK_PRO
+#define DTU_LIBRARY_PC_FEB2016
+// up to here
+
+
+#ifdef MY_MACBOOK_PRO
+
 #define CACHE_LINE 64
 #define CACHE_L1_SIZE 32768				// 32k Data Cache
 #define CACHE_L2_SIZE 262144			// 256k
@@ -30,6 +38,39 @@
 #define CACHE_L2_SIZE_MASK 0x7FFF
 #define CACHE_L3_SIZE_MASK 0x3FFFF
 
+#endif
+
+
+#ifdef DTU_LIBRARY_PC_FEB2016
+
+#define CACHE_LINE 64
+#define CACHE_L1_SIZE 32768				// 32k Data Cache
+#define CACHE_L2_SIZE 262144			// 256k
+#define CACHE_L3_SIZE 8388608			// 8M 3145728			// 3M
+#define CACHE_L1_ASSOCIATIVITY 8
+#define CACHE_L2_ASSOCIATIVITY 8
+#define CACHE_L3_ASSOCIATIVITY 16
+#define CACHE_LINE_BITS 6
+#define CACHE_L1_SIZE_BITS 6
+#define CACHE_L2_SIZE_BITS 9
+#define CACHE_L3_SIZE_BITS 12
+
+#define CACHE_L1_SET_OFFSET 4096
+#define CACHE_L2_SET_OFFSET 32768
+#define CACHE_L3_SET_OFFSET 524288
+
+
+#define CACHE_LINE_MASK 0x3F
+
+#define CACHE_L1_SET_MASK 0xFC0
+#define CACHE_L2_SET_MASK 0x7FC0
+#define CACHE_L3_SET_MASK 0x3FFC0
+
+#define CACHE_L1_SIZE_MASK 0xFFF
+#define CACHE_L2_SIZE_MASK 0x7FFF
+#define CACHE_L3_SIZE_MASK 0x3FFFF
+
+#endif
 
 /*
  *

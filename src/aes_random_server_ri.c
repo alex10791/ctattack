@@ -96,8 +96,9 @@ int main(int argc, char* argv[])
 
     volatile unsigned long int x = 0;
     size_t mem_length = (size_t)CACHE_L3_SIZE; // 4MB : 10000 00000000 00000000
-    volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGE_2MB, -1, 0);
-    B = malloc((int)mem_length);
+    //volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGE_2MB, -1, 0);
+    volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    //B = malloc((int)mem_length);
     volatile char *B_off = B + (0x403a40 & 0xFFF);
     printf("%p\n", B);
     printPtr2bin((void*)B);
@@ -105,77 +106,88 @@ int main(int argc, char* argv[])
 
     while ((new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c))) {
 
-        unsigned char *text;
-        text = (unsigned char *)malloc(AES_BLOCK_SIZE_BYTES);
-/*
-        for (int i = 0; i < AES_BLOCK_SIZE_BYTES; ++i) {
-            text[i] = '\0';
-        }
-*/
+//         unsigned char *text;
+//         text = (unsigned char *)malloc(AES_BLOCK_SIZE_BYTES);
+// /*
+//         for (int i = 0; i < AES_BLOCK_SIZE_BYTES; ++i) {
+//             text[i] = '\0';
+//         }
+// */
 
-        for (int i = 0; i < AES_BLOCK_SIZE_BYTES; ++i) {
-            text[i] = (char)rand()%256;                 //random chars
-            text[i] = 'A';
-        }
+//         for (int i = 0; i < AES_BLOCK_SIZE_BYTES; ++i) {
+//             text[i] = (char)rand()%256;                 //random chars
+//             text[i] = 'A';
+//         }
 
-/*
-        printf("KEY : ");
-        for (int i = 0; i < 32; ++i) {
-            printf("%x:", key[i]);
-        }
-        printf("\nKEY : ");
-        for (int i = 0; i < 32; ++i) {
-            printf("%x:", key[31-i]);
-        }
-*/
-        u32 enc_key[16];
+// /*
+//         printf("KEY : ");
+//         for (int i = 0; i < 32; ++i) {
+//             printf("%x:", key[i]);
+//         }
+//         printf("\nKEY : ");
+//         for (int i = 0; i < 32; ++i) {
+//             printf("%x:", key[31-i]);
+//         }
+// */
+//         u32 enc_key[16];
 
-        ////rijndaelKeySetupEnc(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBits);
-        rijndaelKeySetupEnc(enc_key, (const u8*) key, AES_BLOCK_SIZE_BITS);
-        ////AES_set_encrypt_key(key, AES_BLOCK_SIZE_BITS, &enc_key);
-        ////rijndaelEncrypt(const u32 rk[/*4*(Nr + 1)*/], int Nr, const u8 pt[16], u8 ct[16]);
-        rijndaelEncrypt(enc_key, 10, text, enc_out);
-        ////AES_encrypt(text, enc_out, &enc_key);
+//         ////rijndaelKeySetupEnc(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBits);
+//         rijndaelKeySetupEnc(enc_key, (const u8*) key, AES_BLOCK_SIZE_BITS);
+//         ////AES_set_encrypt_key(key, AES_BLOCK_SIZE_BITS, &enc_key);
+//         ////rijndaelEncrypt(const u32 rk[/*4*(Nr + 1)*/], int Nr, const u8 pt[16], u8 ct[16]);
+//         rijndaelEncrypt(enc_key, 10, text, enc_out);
+//         ////AES_encrypt(text, enc_out, &enc_key);
 
-        //for (int i = 0; B_off+i < B+(int)mem_length; i+=CACHE_LINE) {
-          //  x += B_off[i];      // Takes less time for reload without CONNECT
-            //B_off[i] = 1;     .. Takes more time for reload without CONNECT
-        //}
-        for (int i = 0; B+i < B+(int)mem_length; i+=CACHE_LINE) {
-            x = B[i];          // Takes less time for reload without CONNECT
-            //B[i] = i;     // Takes more time for reload without CONNECT
-        }
+//         //for (int i = 0; B_off+i < B+(int)mem_length; i+=CACHE_LINE) {
+//           //  x += B_off[i];      // Takes less time for reload without CONNECT
+//             //B_off[i] = 1;     .. Takes more time for reload without CONNECT
+//         //}
 
-#ifdef VERBOSE 
-        //char *message;
-        char message[64];
-        unsigned char enc_str[240];
-        //message = (char *) malloc( (strlen("Encrypted Ciphertext: ")) + strlen((char*)enc_out) * 3);
-        sprintf(message, "Encrypted Ciphertext: ");
 
-        enc_str[0] = '\0';
+
+
+//         x += B[0];
+//         x += B[MB(2)];
+//         x += B[MB(4)];
+//         x += B[MB(6)];
+//         for (int i = 0; i < 100; ++i) {
+//             for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
+//                 x = B[i];          // Takes less time for reload without CONNECT    
+//                 //B[i] = i;     // Takes more time for reload without CONNECT
+//             }    
+//         }
         
-        for(int i=0;i<AES_BLOCK_SIZE_BYTES;i++) {
-            sprintf((char*)enc_str, "%s%02X:", enc_str, enc_out[i]);
-        }
 
-        enc_str[strlen((char*)enc_str) - 1] = '\0';
+// #ifdef VERBOSE 
+//         //char *message;
+//         char message[64];
+//         unsigned char enc_str[240];
+//         //message = (char *) malloc( (strlen("Encrypted Ciphertext: ")) + strlen((char*)enc_out) * 3);
+//         sprintf(message, "Encrypted Ciphertext: ");
+
+//         enc_str[0] = '\0';
         
-        sprintf(message, "%s%s", message, enc_str);
+//         for(int i=0;i<AES_BLOCK_SIZE_BYTES;i++) {
+//             sprintf((char*)enc_str, "%s%02X:", enc_str, enc_out[i]);
+//         }
 
-        printf("%s\n", message);
-        //free(message);
-#endif 
+//         enc_str[strlen((char*)enc_str) - 1] = '\0';
+        
+//         sprintf(message, "%s%s", message, enc_str);
 
-#ifdef TOUCH
-        puts("T");
-#endif
+//         printf("%s\n", message);
+//         //free(message);
+// #endif 
 
-#ifdef RESPOND_WITH_BINARY
-        write(new_socket , enc_out , AES_BLOCK_SIZE_BYTES);
-#endif
+// #ifdef TOUCH
+//         puts("T");
+// #endif
 
-        free(text);
+// #ifdef RESPOND_WITH_BINARY
+//         write(new_socket , enc_out , AES_BLOCK_SIZE_BYTES);
+// #endif
+
+//         free(text);
         close(new_socket);
     }
 
