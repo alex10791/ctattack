@@ -54,20 +54,29 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 #endif
 
 
+//    int fd1 = fopen("/mnt/hgfs", "rw");
+//    int fd2 = fopen("/mnt/hgfs", "rw");
 
+    size_t mem_length = (size_t)MB(3); //CACHE_L3_SIZE;  //3*1024*1024; // 4MB : 10000 00000000 00000000
 
-    size_t mem_length = (size_t)CACHE_L3_SIZE;  //3*1024*1024; // 4MB : 10000 00000000 00000000
-    volatile char *B, *C;
 //    volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGE_2MB, -1, 0);
+    volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+//    volatile char *B2 = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
 //    volatile char *B_off = B + (0x403a40 & 0xFFF);
     
 //    volatile char *C = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGE_2MB, -1, 0);
-    
+    volatile char *C = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+//    volatile char *C2 = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+/*    
+    volatile char *B, *C;
     B=malloc((int)mem_length);
     C=malloc((int)mem_length);
-
-    //printf("B\t%p\t\n", B);
-    //printPtr2bin((void*)B);
+*/
+    printf("B\t%p\t\n", B);
+    printPtr2bin((void*)B);
+    
+    printf("B\t%p\t\n", C);
+    printPtr2bin((void*)C);
 
     //printf("Te4\t%x\t\n", 0x403a40);
     //printPtr2bin((void*)0x403a40);
@@ -87,7 +96,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 */
 //for (int count = 0; count < 1000; ++count) {
     begin = timestamp();
-    for (int i = 0; i < (int)mem_length; i+=CACHE_LINE) {
+    for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
         x += B[i];      // Takes less time for reload without CONNECT
         //B[i] = 1;     // Takes more time for reload without CONNECT
         //printf("%d\n", i);
@@ -97,7 +106,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 
 
     begin = timestamp();
-    for (int i = 0; i < (int)mem_length; i+=CACHE_LINE) {
+    for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
         x += B[i];      // Takes less time for reload without CONNECT
         //B[i] = 1;     // Takes more time for reload without CONNECT
     }
@@ -107,7 +116,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 
     for (int j = 0; j < 2; ++j) {
         begin = timestamp();
-        for (int i = 0; i < (int)mem_length; i+=CACHE_LINE) {
+        for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
             x += C[i];      // Takes less time for reload without CONNECT
             //C[i] = 1;     // Takes more time for reload without CONNECT
         }
@@ -115,13 +124,15 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
         printf("Victim\t:\t%.8d cycles\n", end-begin);
     }
     begin = timestamp();
-    for (int i = 0; i < (int)mem_length; i+=CACHE_LINE) {
+    for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
         x += B[i];      // Takes less time for reload without CONNECT
         //B[i] = 1;     // Takes more time for reload without CONNECT
     }
     //x += B[0];
     end = timestamp();
     printf("Reload\t:\t%.8d cycles\n", end-begin);
+
+//    while(1);
     return 0;
 
 #ifdef CONNECT
