@@ -148,13 +148,25 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     printf("Disk\t:\t%.8d cycles\t%.8d cycles\n", end2-begin2, end-begin);
 
 
-    for (int j = 0; j < 1000000; ++j) {
+    for (int i = 0; i < (int)mem_length; ++i) {
+        C[i] = 1;
+    }
+    for (int i = 0; i < (int)mem_length; ++i) {
+        B[i] = 1;
+    }
+
+    /*
+     *
+     * Need to setup this part for Fix-Policy if possible
+     *
+     */
+    for (int j = 0; j < 10000; ++j) {
         for (int k = 0; k < (int)mem_length; k+=CACHE_L3_SET_OFFSET) {
             x += C[k];
         }
 
         for (int i = 0; i < CACHE_L3_ASSOCIATIVITY; ++i) {
-            x += D[CACHE_L3_SET_OFFSET*(CACHE_L3_ASSOCIATIVITY+i)];
+            x += C[CACHE_L3_SET_OFFSET*(CACHE_L3_ASSOCIATIVITY+i)];
             for (int k = 1; k < (int)mem_length; k+=CACHE_L3_SET_OFFSET) {
                 x += C[k];
             }

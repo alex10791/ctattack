@@ -70,6 +70,12 @@
 #define CACHE_L2_SIZE_MASK 0x7FFF
 #define CACHE_L3_SIZE_MASK 0x3FFFF
 
+#define MEM_LOC_TE0	0x4029a0	
+#define MEM_LOC_TE1	0x402da0	
+#define MEM_LOC_TE2	0x4031a0	
+#define MEM_LOC_TE3	0x4035a0	
+#define MEM_LOC_TE4	0x4039a0	
+
 #endif
 
 /*
