@@ -13,7 +13,7 @@
 #define AVERAGE_REPS 100
 #define MAP_HUGE_2MB (21 << MAP_HUGE_SHIFT)
 
-#define REPS 1000
+#define REPS 5
 
 int main(int argc, char* argv[])
 {
@@ -91,8 +91,6 @@ int main(int argc, char* argv[])
     }
 */
 
-
-
 for (int count = 0; count < AVERAGE_REPS; ++count) {
 
 #ifdef CONNECT
@@ -126,6 +124,11 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 #endif
 
 //for (int count = 0; count < 1000; ++count) {
+    /*
+     *
+     * Bring huge from disk
+     *
+     */
     unsigned int begin2, end2;
     begin2 = timestamp();
     x += C[0];
@@ -145,7 +148,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     begin = timestamp();
     x += B[MB(2)-1];
     end = timestamp();
-    printf("Disk\t:\t%.8d cycles\t%.8d cycles\n", end2-begin2, end-begin);
+//    printf("Disk\t:\t%.8d cycles\t%.8d cycles\n", end2-begin2, end-begin);
 
 
     for (int i = 0; i < (int)mem_length; ++i) {
@@ -158,6 +161,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     /*
      *
      * Need to setup this part for Fix-Policy if possible
+     * Attempt to get LRU policy
      *
      */
     for (int j = 0; j < 10000; ++j) {
@@ -184,7 +188,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     //     x += B[j];
     // }
     end = timestamp();
-    printf("Load\t:\t%.8d cycles\n", end-begin);
+//    printf("Load\t:\t%.8d cycles\n", end-begin);
 
     for (int j = 0; j < REPS; ++j) {
         begin = timestamp();
@@ -197,7 +201,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
         // }
         //x += B[0];
         end = timestamp();
-        printf("Load2\t:\t%.8d cycles\n", end-begin);
+//        printf("Load2\t:\t%.8d cycles\n", end-begin);
     }
 
 
@@ -243,7 +247,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     // }
     //x += B[0];
     end = timestamp();
-    printf("Reload\t:\t%.8d cycles\t%d accesses\n", end-begin, (int)mem_length/CACHE_L3_SET_OFFSET);
+//    printf("Reload\t:\t%.8d cycles\t%d accesses\n", end-begin, (int)mem_length/CACHE_L3_SET_OFFSET);
 
 
     //begin = timestamp();

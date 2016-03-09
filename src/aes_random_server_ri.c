@@ -132,10 +132,10 @@ int main(int argc, char* argv[])
         u32 enc_key[16];
 
         ////rijndaelKeySetupEnc(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBits);
-        rijndaelKeySetupEnc(enc_key, (const u8*) key, AES_BLOCK_SIZE_BITS);
+        //rijndaelKeySetupEnc(enc_key, (const u8*) key, AES_BLOCK_SIZE_BITS);
         ////AES_set_encrypt_key(key, AES_BLOCK_SIZE_BITS, &enc_key);
         ////rijndaelEncrypt(const u32 rk[/*4*(Nr + 1)*/], int Nr, const u8 pt[16], u8 ct[16]);
-        rijndaelEncrypt(enc_key, 10, text, enc_out);
+        //rijndaelEncrypt(enc_key, 10, text, enc_out);
         ////AES_encrypt(text, enc_out, &enc_key);
 
         //for (int i = 0; B_off+i < B+(int)mem_length; i+=CACHE_LINE) {
@@ -144,15 +144,17 @@ int main(int argc, char* argv[])
         //}
 
 
-/*
+        //x += B[0];
 
+
+/*
         x += B[0];
         x += B[MB(2)];
         x += B[MB(4)];
         x += B[MB(6)];
 
         for (int i = 0; i < (int)mem_length; ++i) {
-            B[i] = 1;
+            //B[i] = 1;
         }
 
         for (int i = 0; i < 100; ++i) {
@@ -161,7 +163,7 @@ int main(int argc, char* argv[])
                 //B[i] = i;     // Takes more time for reload without CONNECT
             }    
         }
-        
+       
 */
 
 #ifdef VERBOSE 
