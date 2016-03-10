@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 //    int fd1 = fopen("/mnt/hgfs", "rw");
 //    int fd2 = fopen("/mnt/hgfs", "rw");
 
-    size_t mem_length = (size_t)MB(8); //CACHE_L3_SIZE;  //3*1024*1024; // 4MB : 10000 00000000 00000000
+    size_t mem_length = (size_t)CACHE_L3_SIZE; //MB(8); //CACHE_L3_SIZE;  //3*1024*1024; // 4MB : 10000 00000000 00000000
 
 //    volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGE_2MB, -1, 0);
     volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
@@ -134,7 +134,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     x += C[0];
     x += C[MB(2)];
     x += C[MB(4)];
-    x += C[MB(6)];
+    //x += C[MB(6)];
     //x += D[0];
     //x += D[MB(2)];
     //x += D[MB(4)];
@@ -142,7 +142,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     x += B[0];
     x += B[MB(2)];
     x += B[MB(4)];
-    x += B[MB(6)];
+    //x += B[MB(6)];
     end2 = timestamp();
     //printf("Load\t:\t%.8d cycles\n", end-begin);
     begin = timestamp();
