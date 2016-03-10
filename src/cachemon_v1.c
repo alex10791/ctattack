@@ -10,7 +10,7 @@
 
 #define CONNECT
 
-#define AVERAGE_REPS 100
+#define AVERAGE_REPS 1000
 #define MAP_HUGE_2MB (21 << MAP_HUGE_SHIFT)
 
 #define REPS 5
@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
     unsigned long int tt = 0;
     unsigned int begin, end;
     unsigned long int x = 0;
-
+    FILE *fp;
 
 
 //    int fd1 = fopen("/mnt/hgfs", "rw");
@@ -62,6 +62,7 @@ int main(int argc, char* argv[])
     // x += B7[i];      // Takes less time for reload without CONNECT
     // x += B8[i];      // Takes less time for reload without CONNECT
 
+    fp = fopen("/home/user/Documents/github/ctattack/data.csv", "w");
 
 /*    
     volatile char *B, *C;
@@ -142,7 +143,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     x += B[0];
     x += B[MB(2)];
     x += B[MB(4)];
-    //x += B[MB(6)];
+    x += B[MB(6)];
     end2 = timestamp();
     //printf("Load\t:\t%.8d cycles\n", end-begin);
     begin = timestamp();
@@ -151,11 +152,11 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 //    printf("Disk\t:\t%.8d cycles\t%.8d cycles\n", end2-begin2, end-begin);
 
 
-    for (int i = 0; i < (int)mem_length; ++i) {
-        C[i] = 1;
+    for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
+        C[i+CACHE_LINE] = 1;
     }
-    for (int i = 0; i < (int)mem_length; ++i) {
-        B[i] = 1;
+    for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
+        B[i+CACHE_LINE] = 1;
     }
 
     /*
@@ -166,13 +167,13 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
      */
     for (int j = 0; j < 10000; ++j) {
         for (int k = 0; k < (int)mem_length; k+=CACHE_L3_SET_OFFSET) {
-            x += C[k];
+            x += C[k+CACHE_LINE];
         }
 
         for (int i = 0; i < CACHE_L3_ASSOCIATIVITY; ++i) {
             x += C[CACHE_L3_SET_OFFSET*(CACHE_L3_ASSOCIATIVITY+i)];
             for (int k = 1; k < (int)mem_length; k+=CACHE_L3_SET_OFFSET) {
-                x += C[k];
+                x += C[k+CACHE_LINE];
             }
         }
     }
@@ -180,7 +181,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 
     begin = timestamp();
     for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
-        x += B[i];      // Takes less time for reload without CONNECT
+        x += B[i+CACHE_LINE];      // Takes less time for reload without CONNECT
         //B[i] = 1;     // Takes more time for reload without CONNECT
         //printf("%d\n", i);
     }
@@ -193,7 +194,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     for (int j = 0; j < REPS; ++j) {
         begin = timestamp();
         for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
-            x += B[i];      // Takes less time for reload without CONNECT
+            x += B[i+CACHE_LINE];      // Takes less time for reload without CONNECT
             //B[i] = 1;     // Takes more time for reload without CONNECT
         }
         // for (int j = 0; j < CACHE_L1_SIZE; j+=CACHE_L1_SET_OFFSET) {
@@ -239,7 +240,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 
     begin = timestamp();
     for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
-        x += B[i];      // Takes less time for reload without CONNECT
+        x += B[i+CACHE_LINE];      // Takes less time for reload without CONNECT
         //B[i] = 1;     // Takes more time for reload without CONNECT
     }
     // for (int j = 0; j < CACHE_L1_SIZE; j+=CACHE_L1_SET_OFFSET) {
@@ -259,6 +260,8 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     //end = timestamp();
     //printf("%d\n", end-begin);
     tt += (end - begin);///(mem_length/CACHE_LINE);
+
+    fprintf(fp, "%d\n", (end-begin));
 
     //printf("Reload\t:\t%.8lu cycles\n", tt/(count+1));
 
@@ -290,6 +293,8 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     //for (int i = 0; i < 8000000; ++i);
 }
 printf("Reload\t:\t%.8lu cycles\n", tt/AVERAGE_REPS);
+
+fclose(fp);
 
 }
 

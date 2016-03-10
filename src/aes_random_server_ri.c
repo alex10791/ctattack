@@ -145,25 +145,27 @@ int main(int argc, char* argv[])
 
 
         //x += B[0];
-        B[0] = x;
+        //B[0] = x;
 
-/*
+
         x += B[0];
         x += B[MB(2)];
         x += B[MB(4)];
-//        x += B[MB(6)];
+        x += B[MB(6)];
 
-        for (int i = 0; i < (int)mem_length; ++i) {
-            B[i] = 1;
+        for (int j = 0; j < 1; ++j) {
+            for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
+                B[i+CACHE_LINE] = 1;
+            }
         }
 
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 1; ++i) {
             for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
-                x = B[i];          // Takes less time for reload without CONNECT    
+                x = B[i+CACHE_LINE];          // Takes less time for reload without CONNECT    
                 //B[i] = i;     // Takes more time for reload without CONNECT
             }    
         }
-  */     
+       
 
 
 #ifdef VERBOSE 

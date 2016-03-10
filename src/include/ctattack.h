@@ -5,8 +5,8 @@
 
 // only one should be left uncommented
 //#define MY_MACBOOK_PRO
-//#define DTU_LIBRARY_PC_FEB2016
-#define DTU_LAB305_PC_FEB2016
+#define DTU_LIBRARY_PC_FEB2016
+//#define DTU_LAB305_PC_FEB2016
 // up to here
 
 
