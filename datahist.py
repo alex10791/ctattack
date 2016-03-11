@@ -4,6 +4,7 @@ import sys
 import matplotlib.pyplot as plt
 import csv
 import pandas
+import numpy
 from collections import Counter
 
 if (len(sys.argv)) < 2:
@@ -24,9 +25,18 @@ for file in files:
 
 	data = map(int, lst)
 
-	binwidth = 10
+	binwidth = 25
 
 	plt.hist(data, bins=range(min(data), max(data) + binwidth, binwidth), alpha=0.5, label=file)
+
+	stat = numpy.array(data)
+	print ("%s:\tmean:\t%f\tstd:\t%f" % (file, stat.mean(), stat.std()))
+	mode1 = [i for i in data if i < 800]
+	mode2 = [i for i in data if i >= 800]
+	stat = numpy.array(mode1)
+	print ("mode1:\t\tmean:\t%f\tstd:\t%f" % (stat.mean(), stat.std()))
+	stat = numpy.array(mode2)
+	print ("mode2:\t\tmean:\t%f\tstd:\t%f" % (stat.mean(), stat.std()))
 
 
 plt.legend(loc='upper right')

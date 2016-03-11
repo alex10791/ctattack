@@ -22,6 +22,9 @@ TARGET = main
 
 cache_timing_tests: src/cache_timing_tests.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cache_timing_tests src/cache_timing_tests.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	
+cachemon_v2: src/cachemon_v2.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cachemon_v2 src/cachemon_v2.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
 cachemon_v1: src/cachemon_v1.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cachemon_v1 src/cachemon_v1.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)

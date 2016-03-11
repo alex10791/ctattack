@@ -144,10 +144,10 @@ int main(int argc, char* argv[])
         //}
 
 
-        //x += B[0];
-        //B[0] = x;
+        //x += B[0+CACHE_LINE];
+        //B[0+CACHE_LINE] = x;
 
-
+/*
         x += B[0];
         x += B[MB(2)];
         x += B[MB(4)];
@@ -165,8 +165,7 @@ int main(int argc, char* argv[])
                 //B[i] = i;     // Takes more time for reload without CONNECT
             }    
         }
-       
-
+  */     
 
 #ifdef VERBOSE 
         //char *message;

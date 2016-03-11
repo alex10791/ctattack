@@ -10,10 +10,12 @@
 
 #define CONNECT
 
-#define AVERAGE_REPS 1000
+#define AVERAGE_REPS 100
 #define MAP_HUGE_2MB (21 << MAP_HUGE_SHIFT)
 
 #define REPS 5
+
+#define CACHE_LINE_DISTANCES 1
 
 int main(int argc, char* argv[])
 {
@@ -153,10 +155,10 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 
 
     for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
-        C[i+CACHE_LINE] = 1;
+        C[i+CACHE_LINE_DISTANCES*CACHE_LINE] = 1;
     }
     for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
-        B[i+CACHE_LINE] = 1;
+        B[i+CACHE_LINE_DISTANCES*CACHE_LINE] = 1;
     }
 
     /*
@@ -165,15 +167,16 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
      * Attempt to get LRU policy
      *
      */
+
     for (int j = 0; j < 10000; ++j) {
         for (int k = 0; k < (int)mem_length; k+=CACHE_L3_SET_OFFSET) {
-            x += C[k+CACHE_LINE];
+            x += C[k+CACHE_LINE_DISTANCES*CACHE_LINE];
         }
 
         for (int i = 0; i < CACHE_L3_ASSOCIATIVITY; ++i) {
             x += C[CACHE_L3_SET_OFFSET*(CACHE_L3_ASSOCIATIVITY+i)];
             for (int k = 1; k < (int)mem_length; k+=CACHE_L3_SET_OFFSET) {
-                x += C[k+CACHE_LINE];
+                x += C[k+CACHE_LINE_DISTANCES*CACHE_LINE];
             }
         }
     }
@@ -181,7 +184,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 
     begin = timestamp();
     for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
-        x += B[i+CACHE_LINE];      // Takes less time for reload without CONNECT
+        x += B[i+CACHE_LINE_DISTANCES*CACHE_LINE];      // Takes less time for reload without CONNECT
         //B[i] = 1;     // Takes more time for reload without CONNECT
         //printf("%d\n", i);
     }
@@ -194,7 +197,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     for (int j = 0; j < REPS; ++j) {
         begin = timestamp();
         for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
-            x += B[i+CACHE_LINE];      // Takes less time for reload without CONNECT
+            x += B[i+CACHE_LINE_DISTANCES*CACHE_LINE];      // Takes less time for reload without CONNECT
             //B[i] = 1;     // Takes more time for reload without CONNECT
         }
         // for (int j = 0; j < CACHE_L1_SIZE; j+=CACHE_L1_SET_OFFSET) {
@@ -240,7 +243,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 
     begin = timestamp();
     for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
-        x += B[i+CACHE_LINE];      // Takes less time for reload without CONNECT
+        x += B[i+CACHE_LINE_DISTANCES*CACHE_LINE];      // Takes less time for reload without CONNECT
         //B[i] = 1;     // Takes more time for reload without CONNECT
     }
     // for (int j = 0; j < CACHE_L1_SIZE; j+=CACHE_L1_SET_OFFSET) {
@@ -297,4 +300,5 @@ printf("Reload\t:\t%.8lu cycles\n", tt/AVERAGE_REPS);
 fclose(fp);
 
 }
+
 

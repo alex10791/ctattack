@@ -1,1 +1,3 @@
-Cache Replacement Policy - Dynamic Replacement: http://user.it.uu.se/~yi/pdf-files/2014/euc14.pdf
+Cache Replacement Policy - Dynamic Replacement:	http://user.it.uu.se/~yi/pdf-files/2014/euc14.pdf
+Cache Time Latencies (Page 22)			https://software.intel.com/sites/products/collateral/hpc/vtune/performance_analysis_guide.pdf
+
