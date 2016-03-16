@@ -19,7 +19,12 @@ CHEADER_DIR = -I src/include/ -I /usr/local/ssl/include/ -I openssl_aes_ref_impl
 TARGET = main
 
 
+sattolo: src/sattolo.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/sattolo src/sattolo.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
+cacheprof_v1: src/cacheprof_v1.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cacheprof_v1 src/cacheprof_v1.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	
 cache_timing_tests: src/cache_timing_tests.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cache_timing_tests src/cache_timing_tests.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	
