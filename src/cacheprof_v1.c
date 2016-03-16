@@ -9,6 +9,7 @@
 
 #include "ctattack.h"
 
+#define HUGEPAGE_COUNT 64
 
 static int rand_int(int n);
 void shuffle(volatile void **array, int n);
@@ -24,13 +25,69 @@ int main(int argc, char* argv[])
     unsigned int begin, end;
     unsigned int begin2, end2;
     unsigned long int x = 0;
-    unsigned long int arr[CACHE_L3_SIZE/8];
+    //unsigned long int arr[CACHE_L3_SIZE/8];
     char ch = '\0';
 
     size_t mem_length = (size_t)CACHE_L3_SIZE;
-    volatile void **B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    volatile void **B[HUGEPAGE_COUNT];
+
+    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
+        B[i] = (void **)mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    }
+
+    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
+        //B[i] = 1;
+        printf("%d", i);
+        printf("B\t%p\t\n", B[i]);
+        printPtr2bin((void*)B[i]);
+    }
+
+    tt = 0;
+    x += B[0][1];
+    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
+        begin=timestamp();
+        //B = (void **)*B;
+        x += B[0][1];
+        end=timestamp();
+        //arr[i] = end-begin;
+        //printf("%lu\n", end-begin);
+        tt += end-begin;
+    }
+    printf("%lu\n", tt/HUGEPAGE_COUNT);
 
 
+
+/*
+    //shuffle(B, HUGEPAGE_COUNT);
+    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
+        begin=timestamp();
+        //B = (void **)*B;
+        x += B[i][0];
+        end=timestamp();
+        //arr[i] = end-begin;
+        printf("%lu\n", end-begin);
+    }
+    
+    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
+        begin=timestamp();
+        //B = (void **)*B;
+        x += B[i][0];
+        end=timestamp();
+        //arr[i] = end-begin;
+        printf("%lu\n", end-begin);
+    }
+
+    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
+        begin=timestamp();
+        //B = (void **)*B;
+        x += B[i][0];
+        end=timestamp();
+        //arr[i] = end-begin;
+        printf("%lu\n", end-begin);
+    }
+*/
+
+/*
     for (int i = 0; i < CACHE_L3_SIZE/8; ++i) {
     	B[i] = (void **)B+i;
     	arr[i] = i;
@@ -73,6 +130,7 @@ int main(int argc, char* argv[])
     	}
 		scanf("%c", &ch);
     }
+*/
 
 }
 

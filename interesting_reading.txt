@@ -1,3 +1,9 @@
 Cache Replacement Policy - Dynamic Replacement:	http://user.it.uu.se/~yi/pdf-files/2014/euc14.pdf
 Cache Time Latencies (Page 22)			https://software.intel.com/sites/products/collateral/hpc/vtune/performance_analysis_guide.pdf
+Systematic Reverse Engineering of Cache Slice Selection in Intel Processors	https://eprint.iacr.org/2015/690.pdf
+
+
+
+
+Cache Simulators:	Dinero and SMPCache and Sniper Multicore Simulator
 
