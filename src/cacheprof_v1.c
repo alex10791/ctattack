@@ -22,35 +22,78 @@ int main(int argc, char* argv[])
 
 
     unsigned long int tt = 0;
-    unsigned int begin, end;
-    unsigned int begin2, end2;
+    unsigned long int begin, end;
+    unsigned long int begin2, end2;
     unsigned long int x = 0;
     //unsigned long int arr[CACHE_L3_SIZE/8];
     char ch = '\0';
 
-    size_t mem_length = (size_t)CACHE_L3_SIZE;
-    volatile void **B[HUGEPAGE_COUNT];
+    size_t mem_length = (size_t)MB(2);		//CACHE_L3_SIZE;
+    volatile char **B[HUGEPAGE_COUNT];
 
     for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
-        B[i] = (void **)mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+        B[i] = (volatile char **)mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
     }
 
     for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
         //B[i] = 1;
+        B[i][1] = i;
+        
+        printf("%p\n", (void *)vtop((uintptr_t) B[i]));
+
         printf("%d", i);
         printf("B\t%p\t\n", B[i]);
         printPtr2bin((void*)B[i]);
     }
 
+
+    //shuffle((volatile void **)B, HUGEPAGE_COUNT);
+
+    //scanf("%d", &ch);
+
     tt = 0;
-    x += B[0][1];
     for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
+        x += (unsigned long int)B[i][1];
+    }
+
+    //shuffle((volatile void **)B, HUGEPAGE_COUNT);
+
+    volatile char **tmp;
+
+    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
+        x += (unsigned long int)B[i][1];
+
         begin=timestamp();
-        //B = (void **)*B;
-        x += B[0][1];
+		tmp = (volatile char **)B[0];
+        end=timestamp();
+        if ((end-begin) > 79) {
+        	printf("F: RAM\n");
+        } else {
+        	printf("F: L3\n");
+        }
+        //printf("F: %lu\n", end-begin);
+
+        begin=timestamp();
+        B[0] = (volatile char **)B[0];
+        /*
+        x += (unsigned long int)B[i][1]<<1;
+        x += (unsigned long int)B[i][1]<<2;
+        x += (unsigned long int)B[i][1]<<3;
+        x += (unsigned long int)B[i][1]<<4;
+        x += (unsigned long int)B[i][1]<<5;
+        x += (unsigned long int)B[i][1]<<6;
+        x += (unsigned long int)B[i][1]<<7;
+        x += (unsigned long int)B[i][1]<<8;
+        x += (unsigned long int)B[i][1]<<9;
+        */
         end=timestamp();
         //arr[i] = end-begin;
-        //printf("%lu\n", end-begin);
+        if ((end-begin) > 79) {
+        	printf("S: RAM\n");
+        } else {
+        	printf("S: L3\n");
+        }
+        //printf("S: %lu\n", (end-begin));
         tt += end-begin;
     }
     printf("%lu\n", tt/HUGEPAGE_COUNT);
@@ -168,9 +211,8 @@ unsigned long get_page_frame_number_of_address(void *addr) {
 
 uintptr_t vtop(uintptr_t vaddr) {
     FILE *pagemap;
-    intptr_t paddr = 0;
-    printf("%d", MB(2));														// sysconf(_SC_PAGESIZE))
-    int offset = (vaddr / MB(2)) * sizeof(uint64_t);							// sysconf(_SC_PAGESIZE))
+    intptr_t paddr = 0;															
+    int offset = (vaddr / MB(2) ) * sizeof(uint64_t);			// sysconf(_SC_PAGESIZE)
     uint64_t e;
 
     // https://www.kernel.org/doc/Documentation/vm/pagemap.txt
@@ -179,7 +221,7 @@ uintptr_t vtop(uintptr_t vaddr) {
         if (lseek(fileno(pagemap), offset, SEEK_SET) == offset) {
     		printf("Second if\n");
             //if (fread(&e, sizeof(uint64_t), 1, pagemap)) {
-    		if (e = getc(pagemap)) {
+    		if ((e = getc(pagemap))) {
     			printf("Third if\n");
                 if (e & (1ULL << 63)) { // page present ?
     				printf("Fourth if\n");
