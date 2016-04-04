@@ -1,0 +1,2 @@
+
+Seems that when memory miss (ie disk fetch) occurs multible lines are fetched to the cache

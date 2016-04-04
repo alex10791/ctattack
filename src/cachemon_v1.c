@@ -8,7 +8,7 @@
 #include <sys/mman.h>
 #include "ctattack.h"
 
-#define CONNECT
+//#define CONNECT
 
 #define AVERAGE_REPS 100
 #define MAP_HUGE_2MB (21 << MAP_HUGE_SHIFT)
@@ -133,7 +133,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
      *
      */
     unsigned int begin2, end2;
-    begin2 = timestamp();
+    begin2 = timestamp_start();
     x += C[0];
     x += C[MB(2)];
     x += C[MB(4)];
@@ -146,11 +146,11 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     x += B[MB(2)];
     x += B[MB(4)];
     x += B[MB(6)];
-    end2 = timestamp();
+    end2 = timestamp_stop();
     //printf("Load\t:\t%.8d cycles\n", end-begin);
-    begin = timestamp();
+    begin = timestamp_start();
     x += B[MB(2)-1];
-    end = timestamp();
+    end = timestamp_stop();
 //    printf("Disk\t:\t%.8d cycles\t%.8d cycles\n", end2-begin2, end-begin);
 
 
@@ -181,8 +181,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
         }
     }
 
-
-    begin = timestamp();
+    begin = timestamp_start();
     for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
         x += B[i+CACHE_LINE_DISTANCES*CACHE_LINE];      // Takes less time for reload without CONNECT
         //B[i] = 1;     // Takes more time for reload without CONNECT
@@ -191,11 +190,11 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     // for (int j = 0; j < CACHE_L1_SIZE; j+=CACHE_L1_SET_OFFSET) {
     //     x += B[j];
     // }
-    end = timestamp();
+    end = timestamp_stop();
 //    printf("Load\t:\t%.8d cycles\n", end-begin);
 
     for (int j = 0; j < REPS; ++j) {
-        begin = timestamp();
+        begin = timestamp_start();
         for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
             x += B[i+CACHE_LINE_DISTANCES*CACHE_LINE];      // Takes less time for reload without CONNECT
             //B[i] = 1;     // Takes more time for reload without CONNECT
@@ -204,7 +203,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
         //     x += B[j];
         // }
         //x += B[0];
-        end = timestamp();
+        end = timestamp_stop();
 //        printf("Load2\t:\t%.8d cycles\n", end-begin);
     }
 
@@ -241,7 +240,7 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
 #endif
 
 
-    begin = timestamp();
+    begin = timestamp_start();
     for (int i = 0; i < (int)mem_length; i+=CACHE_L3_SET_OFFSET) {
         x += B[i+CACHE_LINE_DISTANCES*CACHE_LINE];      // Takes less time for reload without CONNECT
         //B[i] = 1;     // Takes more time for reload without CONNECT
@@ -250,17 +249,17 @@ for (int count = 0; count < AVERAGE_REPS; ++count) {
     //     x += B[j];
     // }
     //x += B[0];
-    end = timestamp();
+    end = timestamp_stop();
 //    printf("Reload\t:\t%.8d cycles\t%d accesses\n", end-begin, (int)mem_length/CACHE_L3_SET_OFFSET);
 
 
-    //begin = timestamp();
+    //begin = timestamp_start();
     ////for (int i = 0; B+i < B+(int)mem_length; i+=CACHE_LINE) { //CACHE_L1_SET_OFFSET
     ////    x += B[i];
     //    //B_off[i] = 1;
     ////}
     //x += B[0];
-    //end = timestamp();
+    //end = timestamp_stop();
     //printf("%d\n", end-begin);
     tt += (end - begin);///(mem_length/CACHE_LINE);
 

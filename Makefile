@@ -37,6 +37,9 @@ cacheprof_v4: src/cacheprof_v4.c src/ctattack.c
 cache_timing_tests: src/cache_timing_tests.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cache_timing_tests src/cache_timing_tests.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	
+cachemon_v3: src/cachemon_v3.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cachemon_v3 src/cachemon_v3.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
 cachemon_v2: src/cachemon_v2.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cachemon_v2 src/cachemon_v2.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 

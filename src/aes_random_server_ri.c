@@ -114,10 +114,10 @@ int main(int argc, char* argv[])
         }
 */
 
-        for (int i = 0; i < AES_BLOCK_SIZE_BYTES; ++i) {
-            text[i] = (char)rand()%256;                 //random chars
-            text[i] = 'A';
-        }
+        //for (int i = 0; i < AES_BLOCK_SIZE_BYTES; ++i) {
+        //    text[i] = (char)rand()%256;                 //random chars
+        //    text[i] = 'A';
+        //}
 
 /*
         printf("KEY : ");
@@ -130,6 +130,8 @@ int main(int argc, char* argv[])
         }
 */
         u32 enc_key[16];
+        printf("ACCESSING\n");
+        x += B[2*CACHE_LINE];
 
         ////rijndaelKeySetupEnc(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBits);
         //rijndaelKeySetupEnc(enc_key, (const u8*) key, AES_BLOCK_SIZE_BITS);

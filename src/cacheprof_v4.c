@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
         //*tmp=timestamp_start();
         begin=timestamp_start();
         //printPtr2bin((void*)&B[CACHE_L3_SET_OFFSET*i/8]);
-        tmp = (volatile char **)B[i];                          // tmp = B[i]
+        tmp = (volatile char **)B[0];                          // tmp = B[i]
 /*        //printPtr2bin((void*)tmp);
         //printf("%p -> %p\n", tmp, *tmp);
         tmp = (volatile char **)*tmp;                           // tmp = B[i+1]
