@@ -4,8 +4,8 @@
 #include <stdio.h>
 
 // only one should be left uncommented
-//#define MY_MACBOOK_PRO
-#define DTU_LIBRARY_PC_FEB2016
+#define MY_MACBOOK_PRO
+//#define DTU_LIBRARY_PC_FEB2016
 //#define DTU_LAB305_PC_FEB2016
 // up to here
 
@@ -151,10 +151,23 @@
 // DECLARATIONS
 
 unsigned int timestamp(void);
+unsigned long int timestamp_start(void);
+unsigned long int timestamp_stop(void);
+unsigned int timestamp_weak(void);
 
 
 void printPtr2bin(void* ptr);
 void ptr2bin(void* ptr, char bin[65]);
+
+
+/*
+ *
+ * SATTOLO ALGORITHM FUNCTIONS
+ *
+ */
+
+static int rand_int(int n);
+void sattolo_shuffle(volatile void **array, int n);
 
 
 #endif

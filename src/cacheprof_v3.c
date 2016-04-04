@@ -29,35 +29,36 @@ int main(int argc, char* argv[])
     //unsigned long int arr[CACHE_L3_SIZE/8];
     char ch = '\0';
 
-    int arr[8];
+    int arr[CACHE_L3_SIZE/8];
     arr[0] = 1;
 
-    size_t mem_length = (size_t)MB(2);		//CACHE_L3_SIZE;
-    volatile char **B[HUGEPAGE_COUNT];
+    size_t mem_length = (size_t)32*CACHE_L3_SIZE;       //MB(2);		//CACHE_L3_SIZE;
+    volatile char **B;
 
-    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
-        B[i] = (volatile char **)mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    
+
+    B = (volatile char **)mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+
+
+
+    for (int i = 0; i < CACHE_L3_SIZE/8; ++i) {
+        //printf("%d\n", i);
+    	B[i] = (void **)B+i+1;
+    	arr[i] = i;
     }
 
-    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
-        //B[i] = 1;
-        B[i][1] = i;
-        
-        printf("%p\n", (void *)vtop((uintptr_t) B[i]));
+    //scanf("%c", &ch);
+    
 
-        printf("%d", i);
-        printf("B\t%p\t\n", B[i]);
-        printPtr2bin((void*)B[i]);
-
-        printf("Bpage vtop\t%p\t\n", vtop((uintptr_t) B[i]));
-		printf("Bpage get_page_frame_number_of_address\t%p\t\n", get_page_frame_number_of_address((void *) B[i]));
-    }
+    printf("B\t%p\t\n", B);
+	printPtr2bin((void*)B);
+	//printf("B\t%p\t\n", (void*)pB);
+    //printPtr2bin((void*)pB);
+	//printf("B\t%p\t\n", (void*)pB2);
+    //printPtr2bin((void*)pB2);
 
 
-    //shuffle((volatile void **)B, HUGEPAGE_COUNT);
-
-    //scanf("%d", &ch);
-
+    
     tt = 0;
     for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
         x += (unsigned long int)B[i][1];
@@ -65,23 +66,27 @@ int main(int argc, char* argv[])
 
     //shuffle((volatile void **)B, HUGEPAGE_COUNT);
 
+    shuffle(B, HUGEPAGE_COUNT);
+
     volatile char **tmp;
 
     for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
-        x += (unsigned long int)B[i][1];
+        //x += (unsigned long int)B[i][1];
 
+        /*
+        printf("%p\n", B);
         begin=timestamp();
-		tmp = (volatile char **)B[0];
+        tmp = (volatile char **)B[0];
         end=timestamp();
         if ((end-begin) > RAM_ACCESS_TIME_EMPIRICAL) {
-        	printf("F: RAM");
+            printf("F: RAM");
         } else {
-        	printf("F: L3");
+            printf("F: L3");
         }
         printf("\t: %lu\n", end-begin);
-
+        */
         begin=timestamp();
-        B[0] = (volatile char **)B[0];
+        B = (volatile char **)B[0];
         /*
         x += (unsigned long int)B[i][1]<<1;
         x += (unsigned long int)B[i][1]<<2;
@@ -94,93 +99,21 @@ int main(int argc, char* argv[])
         x += (unsigned long int)B[i][1]<<9;
         */
         end=timestamp();
+        
+        //x += (unsigned long int)B[i+1][1];
+
         //arr[i] = end-begin;
         if ((end-begin) > RAM_ACCESS_TIME_EMPIRICAL) {
-        	printf("S: RAM");
+            printf("S: RAM");
         } else {
-        	printf("S: L3");
+            printf("S: L3");
         }
         printf("\t: %lu\n", (end-begin));
         tt += end-begin;
     }
     printf("%lu\n", tt/HUGEPAGE_COUNT);
 
-
-
-/*
-    //shuffle(B, HUGEPAGE_COUNT);
-    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
-        begin=timestamp();
-        //B = (void **)*B;
-        x += B[i][0];
-        end=timestamp();
-        //arr[i] = end-begin;
-        printf("%lu\n", end-begin);
-    }
-    
-    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
-        begin=timestamp();
-        //B = (void **)*B;
-        x += B[i][0];
-        end=timestamp();
-        //arr[i] = end-begin;
-        printf("%lu\n", end-begin);
-    }
-
-    for (int i = 0; i < HUGEPAGE_COUNT; ++i) {
-        begin=timestamp();
-        //B = (void **)*B;
-        x += B[i][0];
-        end=timestamp();
-        //arr[i] = end-begin;
-        printf("%lu\n", end-begin);
-    }
-*/
-
-/*
-    for (int i = 0; i < CACHE_L3_SIZE/8; ++i) {
-    	B[i] = (void **)B+i;
-    	arr[i] = i;
-    }
-
-    
-
-
-    uintptr_t pB = vtop((uintptr_t)B);
-    unsigned long pB2 = get_page_frame_number_of_address((void *)B);
-
-    printf("B\t%p\t\n", B);
-	printPtr2bin((void*)B);
-	printf("B\t%p\t\n", (void*)pB);
-    printPtr2bin((void*)pB);
-	//printf("B\t%p\t\n", (void*)pB2);
-    //printPtr2bin((void*)pB2);
-
-
-
-
-    shuffle(B, CACHE_L3_SIZE/8);
-
-	x = (long int)B;
-
-	begin2=timestamp();
-    for (int i = 0; i < CACHE_L3_SIZE/8; ++i) {
-    	begin=timestamp();
-	    B = (void **)*B;
-	    end=timestamp();
-	    arr[i] = end-begin;
-    }
-    end2=timestamp();
-
-
-    printf("%lu\n", end2-begin2);
-    for (int i = 0; i < (CACHE_L3_SIZE/8)/16; ++i) {
-    	for (int j = 0; j < 16; ++j) {
-    		printf("%lu\n", arr[i*16+j]);
-    	}
-		scanf("%c", &ch);
-    }
-*/
+    printf("TEST2\n");
 
 }
 

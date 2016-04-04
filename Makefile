@@ -24,6 +24,15 @@ sattolo: src/sattolo.c src/ctattack.c
 
 cacheprof_v1: src/cacheprof_v1.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cacheprof_v1 src/cacheprof_v1.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
+cacheprof_v2: src/cacheprof_v2.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cacheprof_v2 src/cacheprof_v2.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
+cacheprof_v3: src/cacheprof_v3.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cacheprof_v3 src/cacheprof_v3.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
+cacheprof_v4: src/cacheprof_v4.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cacheprof_v4 src/cacheprof_v4.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	
 cache_timing_tests: src/cache_timing_tests.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cache_timing_tests src/cache_timing_tests.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
