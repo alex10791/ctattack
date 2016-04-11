@@ -26,20 +26,23 @@ unsigned int timestamp(void) {
 	return cycles_low;
 }
 
-unsigned long int timestamp_start(void) {
+inline unsigned long int timestamp_start(void) {
 	//unsigned int bottom;
 	//unsigned int top;
 	unsigned int cycles_low;
 	unsigned int cycles_high;
 	//asm volatile(".byte 15;.byte 49" : "=a"(bottom),"=d"(top));
-	asm volatile ("CPUID\n\t"
+	asm volatile (".align 16\n\t"
+		"CPUID\n\t"
+		"CPUID\n\t"
+		"CPUID\n\t"
 		"RDTSCP\n\t"
 		"mov %%edx, %0\n\t"
 		"mov %%eax, %1\n\t": "=r" (cycles_high), "=r" (cycles_low)::"%rax", "%rbx", "%rcx", "%rdx");
 	return ((unsigned long int)cycles_high << 32) | cycles_low;
 }
 
-unsigned long int timestamp_stop(void) {
+inline unsigned long int timestamp_stop(void) {
 	//unsigned int bottom;
 	//unsigned int top;
 	unsigned int cycles_low;

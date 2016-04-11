@@ -26,13 +26,15 @@ int main(int argc, char* argv[])
     unsigned long int begin4, end4;
     unsigned long int begin5, end5;
     unsigned long int x = 0;
-    volatile char **tmp;
+    volatile char **tmp1;
+    volatile char **tmp2;
+    volatile char **tmp3;
     char ch = '\0';
     FILE *fp;
     int CACHE_LINE_DISTANCES = 1;
 
 
-    size_t mem_length = (size_t)6*CACHE_L3_SIZE; 
+    size_t mem_length = (size_t)CACHE_L3_SIZE; 
     int mem_length_char = ((int)mem_length/sizeof(char));
     int mem_length_ptr = (int)mem_length/sizeof(void *);
 
@@ -54,24 +56,29 @@ int main(int argc, char* argv[])
  //   x = (volatile char **)B[MB(10)/8];
 
     for (int i = 0; i < mem_length_ptr; ++i) {
-        //B[i] = (volatile char *)((volatile char **)B+i);
-        B[i] = (volatile char *)((volatile char **)B+i+1);
+        B[i] = (volatile char *)((volatile char **)B+((i+CACHE_L3_SET_OFFSET/8)%mem_length_ptr) );
+        //B[i] = (volatile char *)((volatile char **)B+i+1);
         //printf("%p\n", B[i]);
         //if (i%8 == 7) {
         //    B[i] = (volatile char *)&x;
         //}
     }
 
-/*
-    sattolo((volatile void **)B, mem_length_ptr);
 
+//    sattolo((volatile void **)B, mem_length_ptr);
+
+/*
     for (int i = 0; i < mem_length_char; ++i) {
         //printf("%p\n", B[i]);
         if ((i % (CACHE_LINE/8)) == 0) {
             printf("##############################\n");
         }
         printPtr2bin(B[i]);
+        if ((i % (CACHE_L3_SET_OFFSET/8)) == CACHE_L3_SET_OFFSET/8-1) {
+            scanf("%c", &ch);
+        }
     }
+
 
     return 0;
 */
@@ -88,7 +95,7 @@ int main(int argc, char* argv[])
     x = B[MB(26)/8];
     x = B[MB(28)/8];
     x = B[MB(30)/8];
-*/
+
 
     /*
      *
@@ -105,30 +112,45 @@ int main(int argc, char* argv[])
 
     for (int j = 0; j < 100000; ++j) {
         for (int k = 0; k < (int)mem_length/8; k+=CACHE_L3_SET_OFFSET/8) {
-            tmp = (volatile char **)C[k+CACHE_LINE_DISTANCES*CACHE_LINE];                                                              //+CACHE_LINE_DISTANCES*CACHE_LINE
+            tmp1 = (volatile char **)C[k+CACHE_LINE_DISTANCES*CACHE_LINE];                                                              //+CACHE_LINE_DISTANCES*CACHE_LINE
         }
 
         for (int i = 0; i < CACHE_L3_ASSOCIATIVITY; ++i) {
-            tmp = (volatile char **)C[(CACHE_L3_SET_OFFSET/8)*(CACHE_L3_ASSOCIATIVITY+i)];
+            tmp1 = (volatile char **)C[(CACHE_L3_SET_OFFSET/8)*(CACHE_L3_ASSOCIATIVITY+i)];
             for (int k = 1; k < (int)mem_length/8; k+=CACHE_L3_SET_OFFSET/8) {
-                tmp = (volatile char **)C[k+CACHE_LINE_DISTANCES*CACHE_LINE];                                                          //+CACHE_LINE_DISTANCES*CACHE_LINE
+                tmp1 = (volatile char **)C[k+CACHE_LINE_DISTANCES*CACHE_LINE];                                                          //+CACHE_LINE_DISTANCES*CACHE_LINE
             }
         }
     }
+
+    C[0] = (volatile char *)&C[0];
+    C[30*CACHE_LINE] = (volatile char *)&C[30*CACHE_LINE];
+
+
+
 
 
 
     printf("%p\n", B[0+2*CACHE_LINE]);
     printf("%p\n", &B[0+2*CACHE_LINE+1]);
+
+    tmp1 = (volatile char **)B[0];
+    tmp2 = (volatile char **)B[0];
+    tmp3 = (volatile char **)B[0];
     
+    printf("%p\n", tmp1);
+
     for (int i = 0; i < mem_length_char/8; i+=CACHE_L3_SET_OFFSET/8) {           // CACHE_LINE
         printf("%d #############\n", i/(CACHE_L3_SET_OFFSET/8));
 
 
 
-
         begin = timestamp_start();
-        tmp = (volatile char **)B[i+2*CACHE_LINE/8];
+        //tmp = (volatile char **)*tmp;
+        //printPtr2bin(tmp1);
+        tmp1 = (volatile char **)*tmp1;
+        //printPtr2bin(tmp1);
+        //tmp = (volatile char **)B[i+2*CACHE_LINE/8];
         /*tmp = (volatile char **)*tmp;
         tmp = (volatile char **)*tmp;
         tmp = (volatile char **)*tmp;
@@ -138,6 +160,9 @@ int main(int argc, char* argv[])
         tmp = (volatile char **)*tmp;
         tmp += 1;*/
         end = timestamp_stop();
+
+        printf("%p\n", tmp1);
+        
         /*
         printPtr2bin((void*)&B[i+2*CACHE_LINE]);
         if ((end-begin) > RAM_ACCESS_TIME_EMPIRICAL) {
@@ -151,7 +176,10 @@ int main(int argc, char* argv[])
 
 
         begin2 = timestamp_start();
-        tmp = (volatile char **)B[i+2*CACHE_LINE/8];
+        //printPtr2bin(tmp2);
+        tmp2 = (volatile char **)*tmp2;
+        //printPtr2bin(tmp2);
+        //tmp = (volatile char **)B[i+2*CACHE_LINE/8];
         /*tmp = (volatile char **)*tmp;
         tmp = (volatile char **)*tmp;
         tmp = (volatile char **)*tmp;
@@ -161,7 +189,6 @@ int main(int argc, char* argv[])
         tmp = (volatile char **)*tmp;
         tmp += 1;*/
         end2 = timestamp_stop();
-
 
 
 //        begin4 = timestamp_start();
@@ -228,15 +255,13 @@ int main(int argc, char* argv[])
     }
 
 
-    //tmp = (volatile char **)C[0];
+
+    tmp1 = (volatile char **)C[0];
     //tmp1 = (volatile char **)C[30*CACHE_LINE];
-    for (int i = 0; i < 1000; ++i) {
-        for (int i = 0; i < mem_length_char/8; i+=CACHE_L3_SET_OFFSET/8) {
-            //tmp = (volatile char **)*tmp;
-            x += (unsigned long int)C[i+30*CACHE_LINE/8];
-            //tmp1 = (volatile char **)C[30*CACHE_LINE];
-        }
+    for (int i = 0; i < 1000000; ++i) {
+        tmp1 = (volatile char **)*tmp1;
     }
+    
 
 
 
@@ -245,7 +270,7 @@ int main(int argc, char* argv[])
         //printf("%d #############\n", i/(CACHE_L3_SET_OFFSET/8));
         begin = timestamp_start();
         //x = B[(mem_length_char/8)-(i+2*CACHE_LINE)-CACHE_L3_SET_OFFSET/8];
-        tmp = (volatile char **)B[i+2*CACHE_LINE/8];                           //(mem_length_char/8)-(i+2*CACHE_LINE)-CACHE_L3_SET_OFFSET/8
+        tmp3 = (volatile char **)*tmp3;                           //(mem_length_char/8)-(i+2*CACHE_LINE)-CACHE_L3_SET_OFFSET/8
         /*tmp = (volatile char **)*tmp;
         tmp = (volatile char **)*tmp;
         tmp = (volatile char **)*tmp;
@@ -310,14 +335,15 @@ static int rand_int(int n) {
 
 void sattolo(volatile void **array, int n) {
     int i, j;
-    volatile void **tmp[CACHE_LINE/8];
-    n /= CACHE_LINE/8;
+    int stride = CACHE_L3_SET_OFFSET/8;
+    volatile void **tmp[stride];
+    n /= stride;
     for (i = n - 1; i > 0; i--) {
         j = rand_int(i + 1);
-        for (int k = 0; k < CACHE_LINE/8; ++k) {
-            tmp[k] = array[k+j*CACHE_LINE/8];
-            array[k+j*CACHE_LINE/8] = array[k+i*CACHE_LINE/8];
-            array[k+i*CACHE_LINE/8] = tmp[k];
+        for (int k = 0; k < stride; ++k) {
+            tmp[k] = array[k+j*stride];
+            array[k+j*stride] = array[k+i*stride];
+            array[k+i*stride] = tmp[k];
         }
    }
 

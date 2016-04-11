@@ -31,11 +31,22 @@ cacheprof_v2: src/cacheprof_v2.c src/ctattack.c
 cacheprof_v3: src/cacheprof_v3.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cacheprof_v3 src/cacheprof_v3.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
+masm_cacheprof_v4: src/cacheprof_v4.c src/ctattack.c
+	##$(CC) $(CFLAGS) -o asm/cacheprof_v4 src/cacheprof_v4.c src/ctattack.c -O0 -masm=intel $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	gcc src/cacheprof_v4.c src/ctattack.c -S -O0 -masm=intel $(CHEADER_DIR)
+
 cacheprof_v4: src/cacheprof_v4.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cacheprof_v4 src/cacheprof_v4.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	
 cache_timing_tests: src/cache_timing_tests.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cache_timing_tests src/cache_timing_tests.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	
+masm_cachemon_v4: src/cachemon_v4.c src/ctattack.c
+	#$(CC) $(CFLAGS) -o bin/cachemon_v4 src/cachemon_v4.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	gcc src/cachemon_v4.c src/ctattack.c -S -O0 -masm=intel $(CHEADER_DIR)
+	
+cachemon_v4: src/cachemon_v4.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cachemon_v4 src/cachemon_v4.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	
 cachemon_v3: src/cachemon_v3.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cachemon_v3 src/cachemon_v3.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
