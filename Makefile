@@ -34,6 +34,10 @@ aes_simple_client: src/bernstein/clients/aes_simple_client.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/aes_simple_client src/bernstein/clients/aes_simple_client.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
 
+aes_client_v1: src/bernstein/clients/aes_client_v1.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/aes_client_v1 src/bernstein/clients/aes_client_v1.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
+
 
 
 
