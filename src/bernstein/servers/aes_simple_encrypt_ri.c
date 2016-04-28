@@ -57,7 +57,6 @@ int main(int argc, char* argv[])
 
     int server_port = atoi(argv[1]);
 
-    srand(time(NULL));
 
     int socket_desc, new_socket, c;
     struct sockaddr_in server, client;
@@ -116,11 +115,12 @@ int main(int argc, char* argv[])
         //text[strlen(text)] = '\0';         
         text[SERVER_TCP_BUFFER_SIZE-1] = '\0';
 
+
         for (int i = 0; i < AES_BLOCK_SIZE_BYTES; ++i) {
             plaintext[i] = text[i];
-            printf("%c", plaintext[i]);
+//            printf("%c", plaintext[i]);
         }
-        printf("\n");
+//        printf("\n");
 
 
         //printf("text %s\n", text);
@@ -163,8 +163,12 @@ int main(int argc, char* argv[])
         message[AES_BLOCK_SIZE_BYTES+8] = '\0';
         */
         printf("tt : %lu\n", tt);
-        sprintf(message, "%s%lu", message, tt);
-        printf("message: %s\n", message);
+        sprintf(message+16, "%0.18lu", tt);
+        //printf("message: %s\n", message);
+        for (int i = 0; i < 16; ++i) {
+            printf("%d " , message[i]);
+        }
+        printf("%s\n", message+16);
         //message[AES_BLOCK_SIZE_BITS] = (end - begin);
         ////AES_encrypt(text, enc_out, &enc_key);
 
@@ -195,7 +199,7 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef RESPOND_WITH_BINARY
-        write(new_socket , message , AES_BLOCK_SIZE_BYTES+sizeof(unsigned long int));
+        write(new_socket , message , strlen(message));
 #endif
 
         free(text);
