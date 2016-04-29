@@ -25,6 +25,10 @@ TARGET = main
 
 
 
+
+
+
+
 # Bernstein Attack
 
 aes_simple_encrypt_ri: src/bernstein/servers/aes_simple_encrypt_ri.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
@@ -33,11 +37,22 @@ aes_simple_encrypt_ri: src/bernstein/servers/aes_simple_encrypt_ri.c src/ctattac
 aes_simple_client: src/bernstein/clients/aes_simple_client.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/aes_simple_client src/bernstein/clients/aes_simple_client.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
-
 aes_client_v1: src/bernstein/clients/aes_client_v1.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/aes_client_v1 src/bernstein/clients/aes_client_v1.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
 
+
+bernstein_original_server: src/bernstein/original/server.c
+	$(CC) $(CFLAGS) -o bin/server src/bernstein/original/server.c -lcrypto
+
+bernstein_original_study: src/bernstein/original/study.c
+	$(CC) $(CFLAGS) -o bin/study src/bernstein/original/study.c -lm
+
+bernstein_original_ciphertext: src/bernstein/original/ciphertext.c
+	$(CC) $(CFLAGS) -o bin/ciphertext src/bernstein/original/ciphertext.c
+
+bernstein_original_correlate: src/bernstein/original/correlate.c
+	$(CC) $(CFLAGS) -o bin/correlate src/bernstein/original/correlate.c -lm
 
 
 
