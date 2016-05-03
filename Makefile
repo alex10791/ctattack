@@ -42,8 +42,8 @@ aes_client_v1: src/bernstein/clients/aes_client_v1.c src/ctattack.c
 
 
 
-bernstein_original_server: src/bernstein/original/server.c
-	$(CC) $(CFLAGS) -o bin/server src/bernstein/original/server.c -lcrypto
+bernstein_original_server: src/bernstein/original/server.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/server src/bernstein/original/server.c src/ctattack.c -lcrypto $(CHEADER_DIR)
 
 bernstein_original_study: src/bernstein/original/study.c
 	$(CC) $(CFLAGS) -o bin/study src/bernstein/original/study.c -lm
@@ -87,6 +87,12 @@ masm_cachemon_v4: src/ssa/cachemon_v4.c src/ctattack.c
 	#$(CC) $(CFLAGS) -o bin/cachemon_v4 src/ssa/cachemon_v4.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	gcc src/ssa/cachemon_v4.c src/ctattack.c -S -O0 -masm=intel $(CHEADER_DIR)
 	
+cachemon_v6: src/ssa/cachemon_v6.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cachemon_v6 src/ssa/cachemon_v6.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	
+cachemon_v5: src/ssa/cachemon_v5.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cachemon_v5 src/ssa/cachemon_v5.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
 cachemon_v4: src/ssa/cachemon_v4.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cachemon_v4 src/ssa/cachemon_v4.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	

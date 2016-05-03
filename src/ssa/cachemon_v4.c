@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     int CACHE_LINE_DISTANCES = 1;
 
 
-    size_t mem_length = (size_t)CACHE_L3_SIZE; 
+    size_t mem_length = (size_t)3*CACHE_L3_SIZE/2; 
     int mem_length_char = ((int)mem_length/sizeof(char));
     int mem_length_ptr = (int)mem_length/sizeof(void *);
 

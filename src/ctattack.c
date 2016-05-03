@@ -36,7 +36,7 @@ inline unsigned long int timestamp_start(void) {
 		"CPUID\n\t"
 		"CPUID\n\t"
 		"CPUID\n\t"
-		"RDTSCP\n\t"
+		"RDTSC\n\t"
 		"mov %%edx, %0\n\t"
 		"mov %%eax, %1\n\t": "=r" (cycles_high), "=r" (cycles_low)::"%rax", "%rbx", "%rcx", "%rdx");
 	return ((unsigned long int)cycles_high << 32) | cycles_low;
