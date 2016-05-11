@@ -84,6 +84,18 @@ void printPtr2bin(void* ptr) {
 
 
 
+unsigned long int get_global_timestamp_start(void) {
+	return ((unsigned long int)cycles_high_start << 32) | cycles_low_start;
+}
+
+unsigned long int get_global_timestamp_stop(void) {
+	return ((unsigned long int)cycles_high_stop << 32) | cycles_low_stop;
+}
+
+
+
+
+
 
 /*
  *

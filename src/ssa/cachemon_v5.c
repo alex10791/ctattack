@@ -43,19 +43,30 @@ int main(int argc, char* argv[])
     // brings some data in Exclusive (OR Shared state - provably exclusive)
     x = B[MB(0)+3*CACHE_L3_SET_OFFSET];
     x = B[MB(2)+3*CACHE_L3_SET_OFFSET];
-    x = B[MB(4)+3*CACHE_L3_SET_OFFSET];
+    //x = B[MB(4)+3*CACHE_L3_SET_OFFSET];
 
-
+/*
     timestamp_start();
     timestamp_stop();
     timestamp_start();
     timestamp_stop();
-    
+*/  
+
+
+    TIMESTAMP_START;
+    TIMESTAMP_STOP;
+    TIMESTAMP_START;
+    TIMESTAMP_STOP;
+
 
     unsigned long int tbias = 0;
     for (int i = 0; i < 10000; ++i) {
-        begin2 = timestamp_start();
-        end2 = timestamp_stop();
+        //begin2 = timestamp_start();
+        //end2 = timestamp_stop();
+        TIMESTAMP_START;
+        TIMESTAMP_STOP;
+        begin2 = get_global_timestamp_start();
+        end2 = get_global_timestamp_stop();
         tbias += (end2 - begin2);
     }
     tbias /= 10000;
@@ -110,9 +121,15 @@ for (int abc = 0; abc < 100; ++abc){
         }
         printf("\n");
         */
-        begin = timestamp_start();
+        //begin = timestamp_start();
+        TIMESTAMP_START;
         B[i] = 1;
-        end = timestamp_stop();
+        TIMESTAMP_START;
+        TIMESTAMP_STOP;
+
+        begin = get_global_timestamp_start();
+        end = get_global_timestamp_stop();
+        //end = timestamp_stop();
         tt += end-begin;
     }
 
@@ -130,9 +147,14 @@ for (int abc = 0; abc < 100; ++abc){
         }
         printf("\n");
         */
-        begin = timestamp_start();
+        //begin = timestamp_start();
+        TIMESTAMP_START;
         x += B[i];
-        end = timestamp_stop();
+        TIMESTAMP_STOP;
+
+        begin = get_global_timestamp_start();
+        end = get_global_timestamp_stop();
+        //end = timestamp_stop();
         tt2 += end-begin;
     }
 
@@ -155,9 +177,13 @@ for (int abc = 0; abc < 100; ++abc){
         }
         printf("\n");
         */
-        begin = timestamp_start();
+        //begin = timestamp_start();
+        TIMESTAMP_START;
         x += B[i];
-        end = timestamp_stop();
+        TIMESTAMP_STOP;
+        begin2 = get_global_timestamp_start();
+        end2 = get_global_timestamp_stop();
+        //end = timestamp_stop();
         tt3 += end-begin;
     }
 }

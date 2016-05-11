@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     // brings some data in Exclusive (OR Shared state - provably exclusive)
     x = B[MB(0)/8+3*CACHE_L3_SET_OFFSET/8];
     x = B[MB(2)/8+3*CACHE_L3_SET_OFFSET/8];
-    x = B[MB(4)/8+3*CACHE_L3_SET_OFFSET/8];
+    //x = B[MB(4)/8+3*CACHE_L3_SET_OFFSET/8];
 
 
 
@@ -120,7 +120,9 @@ int main(int argc, char* argv[])
 
         E = B;
 
-        begin = timestamp_start();
+
+        TIMESTAMP_START;
+        //begin = timestamp_start();
         E = (volatile char **)*E;
         E = (volatile char **)*E;
         E = (volatile char **)*E;
@@ -133,11 +135,15 @@ int main(int argc, char* argv[])
         E = (volatile char **)*E;
         E = (volatile char **)*E;
         E = (volatile char **)*E;
-        end = timestamp_stop();
+        TIMESTAMP_STOP;
+        begin = get_global_timestamp_start();
+        end = get_global_timestamp_stop();
+        //end = timestamp_stop();
 
         E = B;
 
-        begin2 = timestamp_start();
+        //begin2 = timestamp_start();
+        TIMESTAMP_START;
         E = (volatile char **)*E;
         E = (volatile char **)*E;
         E = (volatile char **)*E;
@@ -150,7 +156,10 @@ int main(int argc, char* argv[])
         E = (volatile char **)*E;
         E = (volatile char **)*E;
         E = (volatile char **)*E;
-        end2 = timestamp_stop();
+        TIMESTAMP_STOP;
+        begin2 = get_global_timestamp_start();
+        end2 = get_global_timestamp_stop();
+        //end2 = timestamp_stop();
 
 
 
