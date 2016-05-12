@@ -255,20 +255,20 @@ int main(int argc, char* argv[])
     }
 
 
-
+/*
     tmp1 = (volatile char **)C[0];
     //tmp1 = (volatile char **)C[30*CACHE_LINE];
     for (int i = 0; i < 1000000; ++i) {
         tmp1 = (volatile char **)*tmp1;
     }
     
-
+*/
 
 
     for (int i = 0; i < mem_length_char/8; i+=CACHE_L3_SET_OFFSET/8) {
         //printf("%p\n", &B[(mem_length_char/8)-(i+2*CACHE_LINE)-CACHE_L3_SET_OFFSET/8]);
         //printf("%d #############\n", i/(CACHE_L3_SET_OFFSET/8));
-        begin = timestamp_start();
+        TIMESTAMP_START;
         //x = B[(mem_length_char/8)-(i+2*CACHE_LINE)-CACHE_L3_SET_OFFSET/8];
         tmp3 = (volatile char **)*tmp3;                           //(mem_length_char/8)-(i+2*CACHE_LINE)-CACHE_L3_SET_OFFSET/8
         /*tmp = (volatile char **)*tmp;
@@ -279,10 +279,14 @@ int main(int argc, char* argv[])
         tmp = (volatile char **)*tmp;
         tmp = (volatile char **)*tmp;
         tmp += 1;*/
-        end = timestamp_stop();
+        TIMESTAMP_STOP;
+        begin = get_global_timestamp_start();
+        end = get_global_timestamp_stop();
 
-        begin3 = timestamp_start();
-        end3 = timestamp_stop();
+        TIMESTAMP_START;
+        TIMESTAMP_STOP;
+        begin3 = get_global_timestamp_start();
+        end3 = get_global_timestamp_stop();
         //end3 = begin3;
 
         if ((end-begin) > RAM_ACCESS_TIME_EMPIRICAL) {

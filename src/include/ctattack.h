@@ -24,9 +24,11 @@
 #define CACHE_L2_SIZE_BITS 9
 #define CACHE_L3_SIZE_BITS 12
 
-#define CACHE_L1_SET_OFFSET 4096
-#define CACHE_L2_SET_OFFSET 32768
-#define CACHE_L3_SET_OFFSET 262144
+#define CACHE_L1_SET_OFFSET 4096		// 4K
+#define CACHE_L2_SET_OFFSET 32768		// 32K
+#define CACHE_L3_SET_OFFSET 262144/2	// 256K
+
+//3MB / 12ways = 1MB / 4ways = 256KB/way
 
 
 #define CACHE_LINE_MASK 0x3F
@@ -147,8 +149,27 @@
 #define CACHE_L3_THRESHOLD 800000 //800000
 
 
+// MARCROS
+
+#define TIMESTAMP_START asm volatile (".align 16\n\t" "CPUID\n\t" "CPUID\n\t" "CPUID\n\t" "RDTSC\n\t" "mov %%edx, %0\n\t" "mov %%eax, %1\n\t": "=r" (cycles_high_start), "=r" (cycles_low_start)::"%rax", "%rbx", "%rcx", "%rdx")
+#define TIMESTAMP_STOP asm volatile ("RDTSCP\n\t" "mov %%edx, %0\n\t" "mov %%eax, %1\n\t" "CPUID\n\t": "=r" (cycles_high_stop), "=r" (cycles_low_stop)::"%rax", "%rbx", "%rcx", "%rdx")
+
+
+
+
+// GLOBAL VARIABLES
+
+unsigned int cycles_low_start;
+unsigned int cycles_high_start;
+unsigned int cycles_low_stop;
+unsigned int cycles_high_stop;
+
+
 
 // DECLARATIONS
+
+unsigned long int get_global_timestamp_start(void);
+unsigned long int get_global_timestamp_stop(void);
 
 unsigned int timestamp(void);
 unsigned long int timestamp_start(void);
