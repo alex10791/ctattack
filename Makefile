@@ -42,8 +42,8 @@ aes_client_v1: src/bernstein/clients/aes_client_v1.c src/ctattack.c
 
 
 
-bernstein_original_server: src/bernstein/original/server.c
-	$(CC) $(CFLAGS) -o bin/server src/bernstein/original/server.c -lcrypto
+bernstein_original_server: src/bernstein/original/server.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/server src/bernstein/original/server.c src/ctattack.c -lcrypto $(CHEADER_DIR)
 
 bernstein_original_study: src/bernstein/original/study.c
 	$(CC) $(CFLAGS) -o bin/study src/bernstein/original/study.c -lm

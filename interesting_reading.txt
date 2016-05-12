@@ -3,7 +3,7 @@ Cache Time Latencies (Page 22)			https://software.intel.com/sites/products/colla
 Systematic Reverse Engineering of Cache Slice Selection in Intel Processors	https://eprint.iacr.org/2015/690.pdf
 
 
-
+Cache Replacement Policies : http://blog.stuffedcow.net/2013/01/ivb-cache-replacement/
 
 Cache Simulators:	Dinero and SMPCache and Sniper Multicore Simulator
 
