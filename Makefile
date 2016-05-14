@@ -2,7 +2,7 @@
 #g++ -g -Wall -o bin/main src/main.cpp
 
 # the compiler: gcc for C program, define as g++ for C++
-CC = gcc
+CC = gcc -std=gnu99
 
 # compiler flags:
 #  -g    adds debugging information to the executable file
@@ -12,7 +12,8 @@ CLIBDIR = -L /usr/local/ssl/lib
 #-L ~/Documents/github/ctattack/openssl1_0_1f/ -L /usr/local/Cellar/cryptopp/5.6.3_1/lib/
 CHEADER_DIR = -I src/include/ -I /usr/local/ssl/include/ -I openssl_aes_ref_impl/
 # -I ~/Documents/github/ctattack/openssl1_0_1f/crypto -I ~/Documents/github/ctattack/openssl1_0_1f/include/
-#CLIBS   = -lcrypto
+CLIBS   = -lm 
+#-lcrypto
 #-lcryptopp
 
 # the build target executable:
@@ -22,6 +23,8 @@ TARGET = main
 
 
 
+virt2phy: src/tools/virt2phy.c
+	$(CC) $(CFLAGS) -o bin/virt2phy src/tools/virt2phy.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
 
 
@@ -87,6 +90,18 @@ masm_cachemon_v4: src/ssa/cachemon_v4.c src/ctattack.c
 	#$(CC) $(CFLAGS) -o bin/cachemon_v4 src/ssa/cachemon_v4.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	gcc src/ssa/cachemon_v4.c src/ctattack.c -S -O0 -masm=intel $(CHEADER_DIR)
 	
+nehalem_first_byte_recov: src/ssa/nehalem_first_byte_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
+	$(CC) $(CFLAGS) -o bin/nehalem_first_byte_recov src/ssa/nehalem_first_byte_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	
+cachemon_v9: src/ssa/cachemon_v9.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cachemon_v9 src/ssa/cachemon_v9.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	
+cachemon_v8: src/ssa/cachemon_v8.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cachemon_v8 src/ssa/cachemon_v8.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	
+cachemon_v7: src/ssa/cachemon_v7.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cachemon_v7 src/ssa/cachemon_v7.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	
 cachemon_v6: src/ssa/cachemon_v6.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cachemon_v6 src/ssa/cachemon_v6.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	
@@ -124,6 +139,9 @@ aes_server: src/servers/aes_server.c src/ctattack.c
 
 aes_random_server_ri: src/servers/aes_random_server_ri.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
 	$(CC) $(CFLAGS) -o bin/aes_random_server_ri src/servers/aes_random_server_ri.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
+aes_server_ri: src/servers/aes_server_ri.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
+	$(CC) $(CFLAGS) -o bin/aes_server_ri src/servers/aes_server_ri.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
 
 

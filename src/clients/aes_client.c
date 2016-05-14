@@ -49,7 +49,8 @@ int main(int argc, char* argv[])
 
 
 
-    message = "GET / HTTP/1.1\r\n\r\n";
+    //message = "GET / HTTP/1.1\r\n\r\n";
+    message = "aabbccddaabbccdd";
     if( send(socket_desc , message , strlen(message) , 0) < 0)
     {
         puts("Send failed");

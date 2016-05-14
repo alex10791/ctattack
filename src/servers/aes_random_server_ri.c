@@ -95,14 +95,15 @@ int main(int argc, char* argv[])
     unsigned char enc_out[AES_BLOCK_SIZE_BYTES];
 
     volatile unsigned long int x = 0;
-    size_t mem_length = (size_t)CACHE_L3_SIZE; // 4MB : 10000 00000000 00000000
+    size_t mem_length = (size_t)MB(2); // 4MB : 10000 00000000 00000000
     //volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGE_2MB, -1, 0);
     volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
     //B = malloc((int)mem_length);
     volatile char *B_off = B + (0x403a40 & 0xFFF);
     printf("%p\n", B);
     printPtr2bin((void*)B);
-    
+
+    B[(0x39e987880 & 0x00003FFFF)] = 0xAA;    
 
     while ((new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c))) {
 
@@ -131,13 +132,13 @@ int main(int argc, char* argv[])
 */
         u32 enc_key[16];
         printf("ACCESSING\n");
-        x += B[2*CACHE_LINE];
+        x += (unsigned long int)(*(B+(0x39e987880 & 0x00003FFFF)) ^ 0x12);
 
         ////rijndaelKeySetupEnc(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBits);
-        //rijndaelKeySetupEnc(enc_key, (const u8*) key, AES_BLOCK_SIZE_BITS);
+        rijndaelKeySetupEnc(enc_key, (const u8*) key, AES_BLOCK_SIZE_BITS);
         ////AES_set_encrypt_key(key, AES_BLOCK_SIZE_BITS, &enc_key);
         ////rijndaelEncrypt(const u32 rk[/*4*(Nr + 1)*/], int Nr, const u8 pt[16], u8 ct[16]);
-        //rijndaelEncrypt(enc_key, 10, text, enc_out);
+        rijndaelEncrypt(enc_key, 10, text, enc_out);
         ////AES_encrypt(text, enc_out, &enc_key);
 
         //for (int i = 0; B_off+i < B+(int)mem_length; i+=CACHE_LINE) {

@@ -4,9 +4,10 @@
 #include <stdio.h>
 
 // only one should be left uncommented
-#define MY_MACBOOK_PRO
+//#define MY_MACBOOK_PRO
 //#define DTU_LIBRARY_PC_FEB2016
 //#define DTU_LAB305_PC_FEB2016
+#define DTU_NEHALEM
 // up to here
 
 
@@ -118,6 +119,41 @@
 
 #endif
 
+
+#ifdef DTU_NEHALEM
+
+#define CACHE_LINE 64
+#define CACHE_L1_SIZE 32768				// 32k Data Cache
+#define CACHE_L2_SIZE 262144			// 256k
+#define CACHE_L3_SIZE 4194304			// 4M
+#define CACHE_L1_ASSOCIATIVITY 8
+#define CACHE_L2_ASSOCIATIVITY 8
+#define CACHE_L3_ASSOCIATIVITY 16
+#define CACHE_LINE_BITS 6
+#define CACHE_L1_SIZE_BITS 6
+#define CACHE_L2_SIZE_BITS 9
+#define CACHE_L3_SIZE_BITS 12
+
+#define CACHE_L1_SET_OFFSET 4096		// 4K
+#define CACHE_L2_SET_OFFSET 32768		// 32K
+#define CACHE_L3_SET_OFFSET 262144/2	// 256K
+
+//3MB / 12ways = 1MB / 4ways = 256KB/way
+
+
+#define CACHE_LINE_MASK 0x3F
+
+#define CACHE_L1_SET_MASK 0xFC0
+#define CACHE_L2_SET_MASK 0x7FC0
+#define CACHE_L3_SET_MASK 0x3FFC0
+
+#define CACHE_L1_SIZE_MASK 0xFFF
+#define CACHE_L2_SIZE_MASK 0x7FFF
+#define CACHE_L3_SIZE_MASK 0x3FFFF
+
+#endif
+
+
 /*
  *
  * Core i5 (I5-2435M)
@@ -140,9 +176,6 @@
  */
 
 
-#define KB(x) x*1024
-#define MB(x) x*1024*1024
-//#define GB(x) x*1024*1024*1024
 
 
 #define ROBOSTNESS_LOOP 10000 //1000000000
@@ -153,7 +186,12 @@
 
 #define TIMESTAMP_START asm volatile (".align 16\n\t" "CPUID\n\t" "CPUID\n\t" "CPUID\n\t" "RDTSC\n\t" "mov %%edx, %0\n\t" "mov %%eax, %1\n\t": "=r" (cycles_high_start), "=r" (cycles_low_start)::"%rax", "%rbx", "%rcx", "%rdx")
 #define TIMESTAMP_STOP asm volatile ("RDTSCP\n\t" "mov %%edx, %0\n\t" "mov %%eax, %1\n\t" "CPUID\n\t": "=r" (cycles_high_stop), "=r" (cycles_low_stop)::"%rax", "%rbx", "%rcx", "%rdx")
+//#define TIMESTAMP_START asm volatile ("RDTSCP\n\t" "mov %%edx, %0\n\t" "mov %%eax, %1\n\t": "=r" (cycles_high_start), "=r" (cycles_low_start)::"%rax", "%rbx", "%rcx", "%rdx")
+//#define TIMESTAMP_STOP asm volatile ("RDTSCP\n\t" "mov %%edx, %0\n\t" "mov %%eax, %1\n\t": "=r" (cycles_high_stop), "=r" (cycles_low_stop)::"%rax", "%rbx", "%rcx", "%rdx")
 
+#define KB(x) x*1024
+#define MB(x) x*1024*1024
+//#define GB(x) x*1024*1024*1024
 
 
 

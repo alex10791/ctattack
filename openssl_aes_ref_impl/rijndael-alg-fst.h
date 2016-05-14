@@ -44,4 +44,8 @@ void rijndaelEncryptRound(const u32 rk[/*4*(Nr + 1)*/], int Nr, u8 block[16], in
 void rijndaelDecryptRound(const u32 rk[/*4*(Nr + 1)*/], int Nr, u8 block[16], int rounds);
 #endif /* INTERMEDIATE_VALUE_KAT */
 
+void* get_virt_addr_TeN(int TeN);
+void* get_phy_addr_TeN(int TeN);
+int get_TeN_idx(int TeN, int idx);
+
 #endif /* __RIJNDAEL_ALG_FST_H */

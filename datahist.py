@@ -14,7 +14,8 @@ if (len(sys.argv)) < 2:
 files = sys.argv[1:]
 
 for file in files:
-	with open('/home/user/Documents/github/ctattack/' + file, 'rb') as f:
+	#with open('/home/user/Documents/github/ctattack/' + file, 'rb') as f:
+	with open(file, 'rb') as f:
 		reader = csv.reader(f)
 		data = list(reader)
 

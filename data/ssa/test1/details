@@ -1,0 +1,9 @@
+This plot shows the access times of two consecutive cachelines
+The one cache line is being accessed by the server while the other is not
+The two can easily be separated by observing the shift in the two plots.
+They are also marked with labels, ncol means there was no collision with
+the cacheline accesed by the server, wcol means there was a collision on 
+with the cachline accessed by the server.
+
+Each dataset contains one million (1000000) time measurments for a total of
+two million (2000000) time measurments

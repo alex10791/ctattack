@@ -1408,3 +1408,112 @@ void rijndaelDecryptRound(const u32 rk[/*4*(Nr + 1)*/], int Nr, u8 block[16], in
 }
 
 #endif /* INTERMEDIATE_VALUE_KAT */
+
+
+
+
+
+#include "unistd.h"
+#include "inttypes.h"
+#define PAGEMAP_LENGTH 8
+
+unsigned long get_page_frame_number_of_address(void *addr) {
+   // Open the pagemap file for the current process
+   FILE *pagemap = fopen("/proc/self/pagemap", "rb");
+
+   // Seek to the page that the buffer is on
+   unsigned long offset = (unsigned long)addr / getpagesize() * PAGEMAP_LENGTH;
+   if(fseek(pagemap, (unsigned long)offset, SEEK_SET) != 0) {
+      fprintf(stderr, "Failed to seek pagemap to proper location\n");
+      exit(1);
+   }
+
+   // The page frame number is in bits 0-54 so read the first 7 bytes and clear the 55th bit
+   unsigned long page_frame_number = 0;
+   fread(&page_frame_number, 1, PAGEMAP_LENGTH-1, pagemap);
+
+   page_frame_number &= 0x7FFFFFFFFFFFFF;
+
+   fclose(pagemap);
+
+   return page_frame_number;
+}
+
+
+
+
+
+
+uintptr_t vtop(uintptr_t vaddr) {
+    FILE *pagemap;
+    intptr_t paddr = 0;                                                         
+    int offset = (vaddr / sysconf(_SC_PAGESIZE) ) * sizeof(uint64_t);            // sysconf(_SC_PAGESIZE)    //MB(2)
+    uint64_t e;
+
+    // https://www.kernel.org/doc/Documentation/vm/pagemap.txt
+    if ((pagemap = fopen("/proc/self/pagemap", "r"))) {
+        printf("First if\n");
+        if (lseek(fileno(pagemap), offset, SEEK_SET) == offset) {
+            printf("Second if\n");
+            //if (fread(&e, sizeof(uint64_t), 1, pagemap)) {
+            if ((e = getc(pagemap))) {
+                printf("Third if\n");
+                if (e & (1ULL << 63)) { // page present ?
+                    printf("Fourth if\n");
+                    paddr = e & ((1ULL << 54) - 1); // pfn mask
+                    paddr = paddr * sysconf(_SC_PAGESIZE);                                      // sysconf(_SC_PAGESIZE))
+                    // add offset within page
+                    paddr = paddr | (vaddr & (sysconf(_SC_PAGESIZE) - 1));                      // sysconf(_SC_PAGESIZE))
+                }   
+            }   
+        }   
+        fclose(pagemap);
+    }   
+
+    return paddr;
+}
+
+
+void* get_virt_addr_TeN(int TeN) {
+    if (TeN == 0)
+        return (void*)Te0;
+    if (TeN == 1)
+        return (void*)Te1;
+    if (TeN == 2)
+        return (void*)Te2;
+    if (TeN == 3)
+        return (void*)Te3;
+    if (TeN == 4)
+        return (void*)Te4;
+    return (void*)NULL;
+}
+
+void* get_phy_addr_TeN(int TeN) {
+    if (TeN == 0)
+        return (void*)get_page_frame_number_of_address((void*)Te0);
+    if (TeN == 1)
+        return (void*)get_page_frame_number_of_address((void*)Te1);
+    if (TeN == 2)
+        return (void*)get_page_frame_number_of_address((void*)Te2);
+    if (TeN == 3)
+        return (void*)get_page_frame_number_of_address((void*)Te3);
+    if (TeN == 4)
+        return (void*)get_page_frame_number_of_address((void*)Te4);
+    return (void*)NULL;
+}
+
+
+int get_TeN_idx(int TeN, int idx) {
+    if (TeN == 0)
+        return Te0[idx];
+    if (TeN == 1)
+        return Te1[idx];
+    if (TeN == 2)
+        return Te2[idx];
+    if (TeN == 3)
+        return Te3[idx];
+    if (TeN == 4)
+        return Te4[idx];
+    return 0x00;
+}
+
