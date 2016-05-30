@@ -127,3 +127,165 @@ void sattolo_shuffle(volatile void **array, int n) {
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// NEHALEM FUNCTIONS
+	
+int nehalem_setup(unsigned long int monline) {
+	unsigned long int cache_line_check_offset = monline & 0x00003FFFF;
+	size_t mem_length = (size_t)MB(2); 
+	unsigned long int x = 0;
+    //int mem_length_char = ((int)mem_length/sizeof(char));
+    //int mem_length_ptr = (int)mem_length/sizeof(void *);
+
+	B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    C = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+
+    // check if memory was properly allocated
+
+	x += (unsigned long int)B[MB(0)];
+	x += (unsigned long int)C[MB(0)];
+
+    B[(0x00 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x01 << 18)/8 + cache_line_check_offset/8);
+    B[(0x01 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x02 << 18)/8 + cache_line_check_offset/8);
+    B[(0x02 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x03 << 18)/8 + cache_line_check_offset/8);
+    B[(0x03 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x04 << 18)/8 + cache_line_check_offset/8);
+    B[(0x04 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x05 << 18)/8 + cache_line_check_offset/8);
+    B[(0x05 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x06 << 18)/8 + cache_line_check_offset/8);
+    B[(0x06 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x07 << 18)/8 + cache_line_check_offset/8);
+    B[(0x07 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x00 << 18)/8 + cache_line_check_offset/8);
+
+    C[(0x00 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x01 << 18)/8 + cache_line_check_offset/8);
+    C[(0x01 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x02 << 18)/8 + cache_line_check_offset/8);
+    C[(0x02 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x03 << 18)/8 + cache_line_check_offset/8);
+    C[(0x03 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x04 << 18)/8 + cache_line_check_offset/8);
+    C[(0x04 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x05 << 18)/8 + cache_line_check_offset/8);
+    C[(0x05 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x06 << 18)/8 + cache_line_check_offset/8);
+    C[(0x06 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x07 << 18)/8 + cache_line_check_offset/8);
+    C[(0x07 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x00 << 18)/8 + cache_line_check_offset/8);
+
+    B[(0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    B[(0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    B[(0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    B[(0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    B[(0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    B[(0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    B[(0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    B[(0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+
+    C[(0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    C[(0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    C[(0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    C[(0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    C[(0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    C[(0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    C[(0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    C[(0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+
+
+    init_prime = B + cache_line_check_offset/8;
+    init_reprime = B + cache_line_check_offset/8 + KB(32)/8;
+
+    return 1;
+}
+
+void nehalem_prime() {
+	TIMESTAMP_START;
+    TIMESTAMP_STOP;
+    TIMESTAMP_START;
+    TIMESTAMP_STOP;
+	volatile char **tmp1 = init_prime;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+}
+
+void nehalem_reprime() {
+	volatile char **tmp1 = init_reprime;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+}
+
+unsigned long int nehalem_probe() {
+	// PROBE & MEASURE
+	unsigned long int begin, end;
+	//unsigned long int begin2, end2;
+    volatile char **tmp1 = init_prime;
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+/*
+    TIMESTAMP_START;
+    TIMESTAMP_STOP;
+    begin2 = get_global_timestamp_start();
+    end2 = get_global_timestamp_stop();
+*/
+    return (end-begin);//-(end2-begin2);
+}
+
+
+
+
+

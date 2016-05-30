@@ -2,6 +2,7 @@
 #define __CTATTACK__
 
 #include <stdio.h>
+#include <sys/mman.h>
 
 // only one should be left uncommented
 //#define MY_MACBOOK_PRO
@@ -214,7 +215,6 @@ unsigned long int timestamp_start(void);
 unsigned long int timestamp_stop(void);
 unsigned int timestamp_weak(void);
 
-
 void printPtr2bin(void* ptr);
 void ptr2bin(void* ptr, char bin[65]);
 
@@ -227,6 +227,20 @@ void ptr2bin(void* ptr, char bin[65]);
 
 static int rand_int(int n);
 void sattolo_shuffle(volatile void **array, int n);
+
+
+
+// Nehalem Functions
+
+volatile char **B;
+volatile char **C;
+volatile char **init_prime;
+volatile char **init_reprime;
+
+int nehalem_setup(unsigned long int monline);
+void nehalem_prime();
+void nehalem_reprime();
+unsigned long int nehalem_probe();
 
 
 #endif

@@ -48,4 +48,6 @@ void* get_virt_addr_TeN(int TeN);
 void* get_phy_addr_TeN(int TeN);
 int get_TeN_idx(int TeN, int idx);
 
+//#define LOG_TE4_0_ACCESSES
+
 #endif /* __RIJNDAEL_ALG_FST_H */

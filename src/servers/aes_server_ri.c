@@ -31,13 +31,14 @@
 #define AES_BLOCK_SIZE_BITS 128
 
 static const unsigned char key[] = {
-    0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff
-};
-/*
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
 };
+/*
+    0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff
+};
+
 */
 
 int main(int argc, char* argv[])
@@ -131,8 +132,11 @@ int main(int argc, char* argv[])
         enc_str[0] = '\0';
 
 
-        u32 enc_key[16];
-        rijndaelKeySetupEnc(enc_key, (const u8*) key, AES_BLOCK_SIZE_BITS);
+
+
+//        printf("KEY SETUP\n");
+        u32 enc_key[32];
+        rijndaelKeySetupEnc((u32*)enc_key, (const u8*) key, (int)AES_BLOCK_SIZE_BITS);
 
 
 
@@ -168,9 +172,10 @@ int main(int argc, char* argv[])
 
         //x += (unsigned long int)(*(B+2048) ^ 0x12);
 
-        x += (get_TeN_idx(4, 0) & (0xFF<<8)) >> 8;
+        //x += (get_TeN_idx(4, 0) & (0xFF<<8)) >> 8;
 
-        //rijndaelEncrypt(enc_key, 10, text, enc_out);
+//        printf("ENCRYPTION\n");
+        rijndaelEncrypt((const u32*)enc_key, (int)10, (const u8*)text, (u8*)enc_out);
 
 /*
         printf(" ENC: ");

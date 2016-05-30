@@ -29,6 +29,9 @@ virt2phy: src/tools/virt2phy.c
 
 
 
+aes_ri_profiling: src/ssa/aes_ri_profiling.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
+	$(CC) $(CFLAGS) -o bin/aes_ri_profiling src/ssa/aes_ri_profiling.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
 
 
 
@@ -89,10 +92,19 @@ cache_timing_tests: src/first_tests/cache_timing_tests.c src/ctattack.c
 masm_cachemon_v4: src/ssa/cachemon_v4.c src/ctattack.c
 	#$(CC) $(CFLAGS) -o bin/cachemon_v4 src/ssa/cachemon_v4.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	gcc src/ssa/cachemon_v4.c src/ctattack.c -S -O0 -masm=intel $(CHEADER_DIR)
+
+nehalem_key_recov: src/ssa/nehalem_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
+	$(CC) $(CFLAGS) -o bin/nehalem_key_recov src/ssa/nehalem_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	
 nehalem_first_byte_recov: src/ssa/nehalem_first_byte_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
 	$(CC) $(CFLAGS) -o bin/nehalem_first_byte_recov src/ssa/nehalem_first_byte_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	
+nehalem_first_byte_recov_v2: src/ssa/nehalem_first_byte_recov_v2.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
+	$(CC) $(CFLAGS) -o bin/nehalem_first_byte_recov_v2 src/ssa/nehalem_first_byte_recov_v2.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	
+cachemon_v9_1: src/ssa/cachemon_v9_1.c src/ctattack.c
+	$(CC) $(CFLAGS) -o bin/cachemon_v9_1 src/ssa/cachemon_v9_1.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
 cachemon_v9: src/ssa/cachemon_v9.c src/ctattack.c
 	$(CC) $(CFLAGS) -o bin/cachemon_v9 src/ssa/cachemon_v9.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	

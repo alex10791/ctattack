@@ -11,7 +11,7 @@
 
 #define RAM_ACCESS_TIME_EMPIRICAL 299
 #define CACHE_LINE_DISTANCES 16
-#define CACHE_LINE_CHECK_OFFSET (0x3c47c0640 & 0x00003FFFF)       //0x3b3a55840
+#define CACHE_LINE_CHECK_OFFSET (0xb1cac640 & 0x00003FFFF)       //0x3b3a55840
 #define CACHE_LINE_VICTIM_OFFSET 256    //(0x39e987880 & 0x00003FFFF)
 #define REPS 1000000
 
@@ -183,7 +183,7 @@ for (count = 0; count < REPS; ++count) {
 
     //message = "GET / HTTP/1.1\r\n\r\n";
     message = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
-    message = "aaaabbbbccccdddd";
+    //message = "aaaabbbbccccdddd";
     if( send(socket_desc , message , 16 , 0) < 0)
     {
         puts("Send failed");

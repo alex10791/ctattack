@@ -727,6 +727,11 @@ static const u32 rcon[] = {
  * @return	the number of rounds for the given cipher key size.
  */
 int rijndaelKeySetupEnc(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBits) {
+#ifdef LOG_TE4_0_ACCESSES
+    unsigned long int address_base = (unsigned long int)Te4;
+    unsigned long int address_base_plus_ext = (unsigned long int)Te4+64;
+#endif
+    
    	int i = 0;
 	u32 temp;
 
@@ -737,6 +742,23 @@ int rijndaelKeySetupEnc(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBit
 	if (keyBits == 128) {
 		for (;;) {
 			temp  = rk[3];
+
+#ifdef LOG_TE4_0_ACCESSES
+            if (((unsigned long int)&Te4[(temp >> 16) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp >>  8) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp      ) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp >> 24)       ] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+#endif
+
+
 			rk[4] = rk[0] ^
 				(Te4[(temp >> 16) & 0xff] & 0xff000000) ^
 				(Te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
@@ -757,6 +779,22 @@ int rijndaelKeySetupEnc(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBit
 	if (keyBits == 192) {
 		for (;;) {
 			temp = rk[ 5];
+
+#ifdef LOG_TE4_0_ACCESSES
+            if (((unsigned long int)&Te4[(temp >> 16) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp >>  8) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp      ) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp >> 24)       ] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+#endif
+
 			rk[ 6] = rk[ 0] ^
 				(Te4[(temp >> 16) & 0xff] & 0xff000000) ^
 				(Te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
@@ -779,6 +817,22 @@ int rijndaelKeySetupEnc(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBit
 	if (keyBits == 256) {
         for (;;) {
         	temp = rk[ 7];
+
+#ifdef LOG_TE4_0_ACCESSES
+            if (((unsigned long int)&Te4[(temp >> 16) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp >>  8) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp      ) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp >> 24)       ] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+#endif
+
         	rk[ 8] = rk[ 0] ^
         		(Te4[(temp >> 16) & 0xff] & 0xff000000) ^
         		(Te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
@@ -792,6 +846,22 @@ int rijndaelKeySetupEnc(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBit
 				return 14;
 			}
         	temp = rk[11];
+
+#ifdef LOG_TE4_0_ACCESSES
+            if (((unsigned long int)&Te4[(temp >> 16) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp >>  8) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp      ) & 0xff] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+            if (((unsigned long int)&Te4[(temp >> 24)       ] >= address_base) && ((unsigned long int)&Te4[(temp >> 16) & 0xff] < address_base_plus_ext)) {
+                printf("IN\n");
+            }
+#endif
+
         	rk[12] = rk[ 4] ^
         		(Te4[(temp >> 24)       ] & 0xff000000) ^
         		(Te4[(temp >> 16) & 0xff] & 0x00ff0000) ^
@@ -853,6 +923,10 @@ int rijndaelKeySetupDec(u32 rk[/*4*(Nr + 1)*/], const u8 cipherKey[], int keyBit
 }
 
 void rijndaelEncrypt(const u32 rk[/*4*(Nr + 1)*/], int Nr, const u8 pt[16], u8 ct[16]) {
+#ifdef LOG_TE4_0_ACCESSES
+    unsigned long int address_base = (unsigned long int)Te4;
+    unsigned long int address_base_plus_ext = (unsigned long int)Te4+64;
+#endif
 
 /*
     printf("Te0\t%p\t\n", (void *)Te0);
@@ -1012,6 +1086,60 @@ void rijndaelEncrypt(const u32 rk[/*4*(Nr + 1)*/], int Nr, const u8 pt[16], u8 c
 	 * apply last round and
 	 * map cipher state to byte array block:
 	 */
+#ifdef LOG_TE4_0_ACCESSES
+    if (((unsigned long int)&Te4[(t0 >> 24)       ] >= address_base) && ((unsigned long int)&Te4[(t0 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t1 >> 16) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t1 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t2 >>  8) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t2 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t3      ) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t3 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+
+    if (((unsigned long int)&Te4[(t1 >> 24)       ] >= address_base) && ((unsigned long int)&Te4[(t1 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t2 >> 16) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t2 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t3 >>  8) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t3 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t0      ) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t0 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+
+    if (((unsigned long int)&Te4[(t2 >> 24)       ] >= address_base) && ((unsigned long int)&Te4[(t2 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t3 >> 16) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t3 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t0 >>  8) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t0 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t1      ) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t1 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+
+    if (((unsigned long int)&Te4[(t3 >> 24)       ] >= address_base) && ((unsigned long int)&Te4[(t3 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t0 >> 16) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t0 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t1 >>  8) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t1 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+    if (((unsigned long int)&Te4[(t2      ) & 0xff] >= address_base) && ((unsigned long int)&Te4[(t2 >> 16) & 0xff] < address_base_plus_ext)) {
+        printf("IN\n");
+    }
+#endif
+
 	s0 =
 		(Te4[(t0 >> 24)       ] & 0xff000000) ^
 		(Te4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
