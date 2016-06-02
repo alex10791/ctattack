@@ -251,5 +251,10 @@ void nehalem_prime();
 void nehalem_reprime();
 unsigned long int nehalem_probe();
 
+int ivybridge_i7_3770_setup(unsigned long int monline);
+void ivybridge_i7_3770_prime();
+void ivybridge_i7_3770_reprime();
+unsigned long int ivybridge_i7_3770_probe();
+
 
 #endif
