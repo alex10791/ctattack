@@ -1,7 +1,10 @@
 
 #include "ctattack.h"
-
 #include <stdlib.h>
+#include "unistd.h"
+#include "inttypes.h"
+#define PAGEMAP_LENGTH 8
+
 
 // IMPLEMENTATION
 
@@ -138,6 +141,30 @@ void sattolo_shuffle(volatile void **array, int n) {
 
 
 
+// VIRTUAL TO PHYSICAL
+
+unsigned long get_pfn(void *addr) {
+   // Open the pagemap file for the current process
+   FILE *pagemap = fopen("/proc/self/pagemap", "rb");
+
+   // Seek to the page that the buffer is on
+   unsigned long offset = (unsigned long)addr / getpagesize() * PAGEMAP_LENGTH;
+   if(fseek(pagemap, (unsigned long)offset, SEEK_SET) != 0) {
+      fprintf(stderr, "Failed to seek pagemap to proper location\n");
+      exit(1);
+   }
+
+   // The page frame number is in bits 0-54 so read the first 7 bytes and clear the 55th bit
+   unsigned long page_frame_number = 0;
+   fread(&page_frame_number, 1, PAGEMAP_LENGTH-1, pagemap);
+
+   page_frame_number &= 0x7FFFFFFFFFFFFF;
+
+   fclose(pagemap);
+
+   return page_frame_number;
+}
+
 
 
 
@@ -164,6 +191,9 @@ int nehalem_setup(unsigned long int monline) {
 	x += (unsigned long int)B[MB(0)];
 	x += (unsigned long int)C[MB(0)];
 
+    //printf("B : %p\n", (void *)get_pfn(B));
+    //printf("C : %p\n", (void *)get_pfn(C));
+
     B[(0x00 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x01 << 18)/8 + cache_line_check_offset/8);
     B[(0x01 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x02 << 18)/8 + cache_line_check_offset/8);
     B[(0x02 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x03 << 18)/8 + cache_line_check_offset/8);
@@ -182,27 +212,51 @@ int nehalem_setup(unsigned long int monline) {
     C[(0x06 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x07 << 18)/8 + cache_line_check_offset/8);
     C[(0x07 << 18)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x00 << 18)/8 + cache_line_check_offset/8);
 
-    B[(0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    B[(0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    B[(0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    B[(0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    B[(0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    B[(0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    B[(0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    B[(0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+    if ( ((0x07 << 18) + cache_line_check_offset + KB(32)) < MB(2) ) {
+    	B[(0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    B[(0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    B[(0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    B[(0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    B[(0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    B[(0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    B[(0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    B[(0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
 
-    C[(0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    C[(0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    C[(0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    C[(0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    C[(0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    C[(0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    C[(0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
-    C[(0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    C[(0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    C[(0x01 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    C[(0x02 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    C[(0x03 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    C[(0x04 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    C[(0x05 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    C[(0x06 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+	    C[(0x07 << 18)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x00 << 18)/8 + cache_line_check_offset/8 + KB(32)/8);
+
+	    init_reprime = B + cache_line_check_offset/8 + KB(32)/8;
+    } else {
+    	B[(0x00 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x01 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    B[(0x01 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x02 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    B[(0x02 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x03 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    B[(0x03 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x04 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    B[(0x04 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x05 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    B[(0x05 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x06 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    B[(0x06 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x07 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    B[(0x07 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x00 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+
+	    C[(0x00 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x01 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    C[(0x01 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x02 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    C[(0x02 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x03 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    C[(0x03 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x04 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    C[(0x04 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x05 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    C[(0x05 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x06 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    C[(0x06 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x07 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+	    C[(0x07 << 18)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x00 << 18)/8 + cache_line_check_offset/8 - KB(32)/8);
+
+	    init_reprime = B + cache_line_check_offset/8 - KB(32)/8;
+    }
 
 
     init_prime = B + cache_line_check_offset/8;
-    init_reprime = B + cache_line_check_offset/8 + KB(32)/8;
+    
 
     return 1;
 }

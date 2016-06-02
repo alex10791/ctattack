@@ -54,11 +54,13 @@ int read_pagemap(char * path_buf, unsigned long virt_addr){
       printf("Error! Cannot open %s\n", path_buf);
       return -1;
    }
-   
+   printf("Page Size: %d\n", getpagesize());
    //Shifting by virt-addr-offset number of bytes
    //and multiplying by the size of an address (the size of an entry in pagemap file)
-   file_offset = virt_addr / getpagesize() * PAGEMAP_ENTRY;
-   printf("Vaddr: 0x%lx, Page_size: %d, Entry_size: %d\n", virt_addr, getpagesize(), PAGEMAP_ENTRY);
+   file_offset = virt_addr / (2*1024*1024) * PAGEMAP_ENTRY * (2*1024*1024) / 4096;
+   //file_offset = virt_addr / getpagesize() * PAGEMAP_ENTRY;
+   printf("Vaddr: 0x%lx, Page_size: %d, Entry_size: %d\n", virt_addr, (2*1024*1024), PAGEMAP_ENTRY);
+   //printf("Vaddr: 0x%lx, Page_size: %d, Entry_size: %d\n", virt_addr, getpagesize(), PAGEMAP_ENTRY);
    printf("Reading %s at 0x%llx\n", path_buf, (unsigned long long) file_offset);
    status = fseek(f, file_offset, SEEK_SET);
    if(status){

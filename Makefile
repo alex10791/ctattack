@@ -93,6 +93,9 @@ masm_cachemon_v4: src/ssa/cachemon_v4.c src/ctattack.c
 	#$(CC) $(CFLAGS) -o bin/cachemon_v4 src/ssa/cachemon_v4.c src/ctattack.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	gcc src/ssa/cachemon_v4.c src/ctattack.c -S -O0 -masm=intel $(CHEADER_DIR)
 
+nehalem_key_recov_v2: src/ssa/nehalem_key_recov_v2.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
+	$(CC) $(CFLAGS) -o bin/nehalem_key_recov_v2 src/ssa/nehalem_key_recov_v2.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+	
 nehalem_key_recov: src/ssa/nehalem_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
 	$(CC) $(CFLAGS) -o bin/nehalem_key_recov src/ssa/nehalem_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 	

@@ -230,6 +230,15 @@ void sattolo_shuffle(volatile void **array, int n);
 
 
 
+
+// VIRTUAL TO PHYSICAL
+
+unsigned long get_pfn(void *addr);
+
+
+
+
+
 // Nehalem Functions
 
 volatile char **B;

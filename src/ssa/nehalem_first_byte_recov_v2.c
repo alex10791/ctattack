@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     int X[256], Y[256], K[256];
 
 
-    nehalem_setup(0x3ac1011a0);
+    nehalem_setup(0x38c7b91a0);
 
     for (i = 0; i < REPS; ++i) {
         times[i] = 0;

