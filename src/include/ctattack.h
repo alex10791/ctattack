@@ -243,14 +243,19 @@ unsigned long get_pfn(void *addr);
 
 volatile char **B;
 volatile char **C;
+volatile char **D;
+volatile char **E;
 volatile char **init_prime;
 volatile char **init_reprime;
 
+int nehalem_cache_slice_alg(void* addr);
 int nehalem_setup(unsigned long int monline);
 void nehalem_prime();
 void nehalem_reprime();
 unsigned long int nehalem_probe();
 
+int ivybridge_i7_3770_cache_slice_from_virt(void* addr);
+int ivybridge_i7_3770_cache_slice_alg(void* addr);
 int ivybridge_i7_3770_setup(unsigned long int monline);
 void ivybridge_i7_3770_prime();
 void ivybridge_i7_3770_reprime();
