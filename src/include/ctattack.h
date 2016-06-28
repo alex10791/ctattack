@@ -261,5 +261,12 @@ void ivybridge_i7_3770_prime();
 void ivybridge_i7_3770_reprime();
 unsigned long int ivybridge_i7_3770_probe();
 
+int sandybridge_i5_2435m_cache_slice_from_virt(void* addr);
+int sandybridge_i5_2435m_cache_slice_alg(void* addr);
+int sandybridge_i5_2435m_setup(unsigned long int monline);
+void sandybridge_i5_2435m_prime();
+void sandybridge_i5_2435m_reprime();
+unsigned long int sandybridge_i5_2435m_probe();
+
 
 #endif

@@ -343,6 +343,8 @@ unsigned long int nehalem_probe() {
     return (end-begin);//-(end2-begin2);
 }
 
+
+
 int ivybridge_i7_3770_cache_slice_from_virt(void* addr) {
     unsigned long int x = ((unsigned long int*)addr)[0];
     return ivybridge_i7_3770_cache_slice_alg((void*)(get_pfn(addr) << 12));
@@ -393,6 +395,7 @@ int ivybridge_i7_3770_cache_slice_alg(void* addr) {
              ^ ((i_addr & 0x000400000) >> 22) ^ ((i_addr & 0x000800000) >> 23) ^ ((i_addr & 0x001000000) >> 24) ^ ((i_addr & 0x004000000) >> 26) 
              ^ ((i_addr & 0x010000000) >> 28) ^ ((i_addr & 0x020000000) >> 29) ^ ((i_addr & 0x080000000) >> 31) ^ ((i_addr & 0x200000000) >> 33)
              ^ ((i_addr & 0x400000000) >> 34);
+
 
     return ((bit1 << 1) | bit0);
 }
@@ -704,6 +707,342 @@ unsigned long int ivybridge_i7_3770_probe() {
     tmp1 = (volatile char **)*tmp1;
     tmp1 = (volatile char **)*tmp1;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+/*
+    TIMESTAMP_START;
+    TIMESTAMP_STOP;
+    begin2 = get_global_timestamp_start();
+    end2 = get_global_timestamp_stop();
+*/
+    return (end-begin);//-(end2-begin2);
+}
+
+
+
+// Sandy Bridge
+
+int sandybridge_i5_2435m_cache_slice_from_virt(void* addr) {
+    unsigned long int x = ((unsigned long int*)addr)[0];
+    return sandybridge_i5_2435m_cache_slice_alg((void*)(get_pfn(addr) << 12));
+}
+
+int sandybridge_i5_2435m_cache_slice_alg(void* addr) {
+    //printf("sandybridge_i5_2435m_cache_slice\n");
+    //unsigned long int x = ((unsigned long int*)addr)[0];
+    //unsigned long int i_addr = (unsigned long int) get_pfn(addr);
+    
+    printf("\n%016p : \n", (void *) addr);
+
+    unsigned long int i_addr = (unsigned long int) addr;
+
+/*
+    printf("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n");
+    printPtr2bin((void *) addr);
+    printf("17:%lu 18:%lu 20:%lu 22:%lu 24:%lu 25:%lu 26:%lu 27:%lu 28:%lu 30:%lu\n", ((i_addr & 0x000020000) >> 17), ((i_addr & 0x000040000) >> 18), 
+                ((i_addr & 0x000100000) >> 20), ((i_addr & 0x000400000) >> 22), ((i_addr & 0x001000000) >> 24), ((i_addr & 0x002000000) >> 25),
+                ((i_addr & 0x004000000) >> 26), ((i_addr & 0x008000000) >> 27), ((i_addr & 0x010000000) >> 28), ((i_addr & 0x040000000) >> 30));
+    printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
+*/
+
+    // According to lackingrhoticity.blogspot.dk/2015/04/l3-cache-mapping-on-sandy-bridge-cpus.html
+    // Intel Core i5 2435M (2 core)
+    int bit0 = ((i_addr & 0x000020000) >> 17) ^ ((i_addr & 0x000040000) >> 18) ^ ((i_addr & 0x000100000) >> 20) ^ ((i_addr & 0x000400000) >> 22) 
+             ^ ((i_addr & 0x001000000) >> 24) ^ ((i_addr & 0x002000000) >> 25) ^ ((i_addr & 0x004000000) >> 26) ^ ((i_addr & 0x008000000) >> 27) 
+             ^ ((i_addr & 0x010000000) >> 28) ^ ((i_addr & 0x040000000) >> 30); // ^ ((i_addr & 0x100000000) >> 32) ^ ((i_addr & 0x200000000) >> 33);
+
+
+    return bit0;
+}
+
+
+// Ivy Bridge i7-3770 FUNCTIONS
+    
+int sandybridge_i5_2435m_setup(unsigned long int monline) {
+    //printf("sandybridge_i5_2435m_setup\n");
+    unsigned long int cache_line_check_offset = monline & 0x00001FFFF;  // 0001 1111 1111 1111 1111
+    printPtr2bin((void *)cache_line_check_offset);
+    size_t mem_length = (size_t)MB(2); 
+    unsigned long int x = 0;
+    int i = 0;
+    //int mem_length_char = ((int)mem_length/sizeof(char));
+    //int mem_length_ptr = (int)mem_length/sizeof(void *);
+
+// Cache slice selection algorithm needs verification
+// p17 ⊕ p18 ⊕ p20 ⊕ p22 ⊕ p24 ⊕ p25 ⊕ p26 ⊕ p27 ⊕ p28 ⊕ p30 ⊕ p32
+// p18 ⊕ p19 ⊕ p21 ⊕ p23 ⊕ p25 ⊕ p27 ⊕ p29 ⊕ p30 ⊕ p31 ⊕ p32
+
+    int monline_cache_slice = sandybridge_i5_2435m_cache_slice_alg((void *) monline);
+    printf("monline_cache_slice\t:\t%d\n", monline_cache_slice);
+
+    void *tmp[128];
+    int B_idx = -1;
+    int C_idx = -1;
+
+    int cache_slice_pattern[2][8];
+
+    cache_slice_pattern[0][0] = 0x0;
+    cache_slice_pattern[0][1] = 0xa;
+    cache_slice_pattern[0][2] = 0x9;
+    cache_slice_pattern[0][3] = 0x3;
+    cache_slice_pattern[0][4] = 0x4;
+    cache_slice_pattern[0][5] = 0xe;
+    cache_slice_pattern[0][6] = 0xd;
+    cache_slice_pattern[0][7] = 0x7;
+
+    cache_slice_pattern[1][0] = 0x8;
+    cache_slice_pattern[1][1] = 0x2;
+    cache_slice_pattern[1][2] = 0x1;
+    cache_slice_pattern[1][3] = 0xb;
+    cache_slice_pattern[1][4] = 0xc;
+    cache_slice_pattern[1][5] = 0x6;
+    cache_slice_pattern[1][6] = 0x5;
+    cache_slice_pattern[1][7] = 0xf;
+
+
+    for (i = 0; i < 128; ++i) tmp[i] = NULL;
+
+    for (i = 0; i < 128; ++i) {
+        tmp[i] = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+        printf("sandybridge_i5_2435m_cache_slice_from_virt(tmp[i])\t:\t%d\n", sandybridge_i5_2435m_cache_slice_from_virt(tmp[i]));
+        //x += (unsigned long int)(*((unsigned int)tmp[i]));
+        if (sandybridge_i5_2435m_cache_slice_from_virt(tmp[i]) == 0) {     //monline_cache_slice
+            if (B_idx == -1) {
+                B = tmp[i];
+                B_idx = i;
+                continue;
+            }
+            if (C_idx == -1) {
+                C = tmp[i];
+                C_idx = i;
+                break;
+            }
+        }
+    }
+    
+    printf("B_idx\t:\t%d\n", B_idx);
+    printf("C_idx\t:\t%d\n", C_idx);
+
+    if (B_idx == -1 || C_idx == -1) return 0;
+
+    // THIS FOR LOOP NEEDS REVISION (is munmap((void *) addr, size_t length) relieasing the hugepage as expected?)
+    for (i = 0; i < 128; ++i) {
+        //printf("i\t:\t%d\n", i);
+        if (i != B_idx && i != C_idx && tmp[i] != NULL) {
+            munmap(tmp[i], MB(2));
+        }
+    }
+
+
+
+    //B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    //C = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+
+    // check if memory was properly allocated
+
+    x += (unsigned long int)B[MB(0)];
+    x += (unsigned long int)C[MB(0)];
+    //x += (unsigned long int)D[MB(0)];
+    //x += (unsigned long int)E[MB(0)];
+
+    //printf("B : %p\n", (void *)get_pfn(B));
+    //printf("C : %p\n", (void *)get_pfn(C));
+
+
+    B[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8);
+    B[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8);
+    B[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8);
+    B[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8);
+    B[(cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8);
+    B[(cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8);
+    B[(cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8);
+    B[(cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
+
+    C[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8);
+    C[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8);
+    C[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8);
+    C[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8);
+    C[(cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8);
+    C[(cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8);
+    C[(cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8);
+    C[(cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
+
+    
+
+    if ( ((cache_slice_pattern[monline_cache_slice][3] << 17) + cache_line_check_offset + KB(32)) < MB(2) ) {
+        B[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+
+        C[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+
+        
+
+        init_reprime = B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8;
+    } else {
+        B[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+
+        C[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][4] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][5] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][6] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][7] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+
+        
+        init_reprime = B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8;
+    }
+
+
+    init_prime = B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8;
+    
+
+    return 1;
+}
+
+void sandybridge_i5_2435m_prime() {
+    //printf("sandybridge_i5_2435m_prime\n");
+    TIMESTAMP_START;
+    TIMESTAMP_STOP;
+    TIMESTAMP_START;
+    TIMESTAMP_STOP;
+    volatile char **tmp1 = init_prime;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    tmp1 = (volatile char **)*tmp1;
+    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    printPtr2bin((void*)tmp1);
+    
+    //tmp1 = (volatile char **)*tmp1;
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
+    //tmp1 = (volatile char **)*tmp1;
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
+    //tmp1 = (volatile char **)*tmp1;
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
+    //tmp1 = (volatile char **)*tmp1;
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
+}
+
+void sandybridge_i5_2435m_reprime() {
+    //printf("sandybridge_i5_2435m_reprime\n");
+    volatile char **tmp1 = init_reprime;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    //tmp1 = (volatile char **)*tmp1;
+    //tmp1 = (volatile char **)*tmp1;
+    //tmp1 = (volatile char **)*tmp1;
+    //tmp1 = (volatile char **)*tmp1;
+}
+
+unsigned long int sandybridge_i5_2435m_probe() {
+    //printf("sandybridge_i5_2435m_probe\n");
+    // PROBE & MEASURE
+    unsigned long int begin, end;
+    //unsigned long int begin2, end2;
+    volatile char **tmp1 = init_prime;
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    //tmp1 = (volatile char **)*tmp1;
+    //tmp1 = (volatile char **)*tmp1;
+    //tmp1 = (volatile char **)*tmp1;
+    //tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
