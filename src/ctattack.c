@@ -733,7 +733,7 @@ int sandybridge_i5_2435m_cache_slice_alg(void* addr) {
     //unsigned long int x = ((unsigned long int*)addr)[0];
     //unsigned long int i_addr = (unsigned long int) get_pfn(addr);
     
-    printf("\n%016p : \n", (void *) addr);
+    //printf("\n%016p : \n", (void *) addr);
 
     unsigned long int i_addr = (unsigned long int) addr;
 
@@ -762,19 +762,15 @@ int sandybridge_i5_2435m_cache_slice_alg(void* addr) {
 int sandybridge_i5_2435m_setup(unsigned long int monline) {
     //printf("sandybridge_i5_2435m_setup\n");
     unsigned long int cache_line_check_offset = monline & 0x00001FFFF;  // 0001 1111 1111 1111 1111
-    printPtr2bin((void *)cache_line_check_offset);
+    //printPtr2bin((void *)cache_line_check_offset);
     size_t mem_length = (size_t)MB(2); 
     unsigned long int x = 0;
     int i = 0;
     //int mem_length_char = ((int)mem_length/sizeof(char));
     //int mem_length_ptr = (int)mem_length/sizeof(void *);
 
-// Cache slice selection algorithm needs verification
-// p17 ⊕ p18 ⊕ p20 ⊕ p22 ⊕ p24 ⊕ p25 ⊕ p26 ⊕ p27 ⊕ p28 ⊕ p30 ⊕ p32
-// p18 ⊕ p19 ⊕ p21 ⊕ p23 ⊕ p25 ⊕ p27 ⊕ p29 ⊕ p30 ⊕ p31 ⊕ p32
-
     int monline_cache_slice = sandybridge_i5_2435m_cache_slice_alg((void *) monline);
-    printf("monline_cache_slice\t:\t%d\n", monline_cache_slice);
+    //printf("monline_cache_slice\t:\t%d\n", monline_cache_slice);
 
     void *tmp[128];
     int B_idx = -1;
@@ -805,7 +801,7 @@ int sandybridge_i5_2435m_setup(unsigned long int monline) {
 
     for (i = 0; i < 128; ++i) {
         tmp[i] = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
-        printf("sandybridge_i5_2435m_cache_slice_from_virt(tmp[i])\t:\t%d\n", sandybridge_i5_2435m_cache_slice_from_virt(tmp[i]));
+        //printf("sandybridge_i5_2435m_cache_slice_from_virt(tmp[i])\t:\t%d\n", sandybridge_i5_2435m_cache_slice_from_virt(tmp[i]));
         //x += (unsigned long int)(*((unsigned int)tmp[i]));
         if (sandybridge_i5_2435m_cache_slice_from_virt(tmp[i]) == 0) {     //monline_cache_slice
             if (B_idx == -1) {
@@ -821,8 +817,8 @@ int sandybridge_i5_2435m_setup(unsigned long int monline) {
         }
     }
     
-    printf("B_idx\t:\t%d\n", B_idx);
-    printf("C_idx\t:\t%d\n", C_idx);
+    //printf("B_idx\t:\t%d\n", B_idx);
+    //printf("C_idx\t:\t%d\n", C_idx);
 
     if (B_idx == -1 || C_idx == -1) return 0;
 
@@ -834,6 +830,8 @@ int sandybridge_i5_2435m_setup(unsigned long int monline) {
         }
     }
 
+    printf("%p\n", B);
+    printf("%p\n", C);
 
 
     //B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
@@ -929,57 +927,57 @@ void sandybridge_i5_2435m_prime() {
     TIMESTAMP_START;
     TIMESTAMP_STOP;
     volatile char **tmp1 = init_prime;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     tmp1 = (volatile char **)*tmp1;
-    printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
-    printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
-    printPtr2bin((void*)tmp1);
+    //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
+    //printPtr2bin((void*)(get_pfn((void*)tmp1) << 12));
+    //printPtr2bin((void*)tmp1);
     
     //tmp1 = (volatile char **)*tmp1;
     //printf("%d : ", sandybridge_i5_2435m_cache_slice_from_virt((void*)tmp1));
@@ -1028,17 +1026,76 @@ unsigned long int sandybridge_i5_2435m_probe() {
     volatile char **tmp1 = init_prime;
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    printf("%lu\n", end-begin);
     //tmp1 = (volatile char **)*tmp1;
     //tmp1 = (volatile char **)*tmp1;
     //tmp1 = (volatile char **)*tmp1;
@@ -1046,6 +1103,7 @@ unsigned long int sandybridge_i5_2435m_probe() {
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    //printf("%lu\n", end-begin);
 /*
     TIMESTAMP_START;
     TIMESTAMP_STOP;

