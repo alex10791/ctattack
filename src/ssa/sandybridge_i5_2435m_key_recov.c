@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     F[2048] = 0xAA;
 
 
-    if (!sandybridge_i5_2435m_setup(F)) {       //0x56961540
+    if (!sandybridge_i5_2435m_setup_m2(F)) {       //0x56961540
         printf("[x] Not enough memory could be allocated on required cache-slice, please try again and/or increase hugepages available memory");
         return 0;
     }
@@ -87,16 +87,16 @@ int main(int argc, char* argv[])
             //if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0) { printf("connection error\n"); return 1; } //printf("Connected\n");
 
             //printf("sandybridge_i5_2435m_prime\n");
-            sandybridge_i5_2435m_prime(); //return 0;
+            sandybridge_i5_2435m_prime_m2(); //return 0;
             //printf("sandybridge_i5_2435m_reprime\n");
-            sandybridge_i5_2435m_reprime();
+            sandybridge_i5_2435m_reprime_m2();
 
             //if( send(socket_desc , message , 16 , 0) < 0) { puts("Send failed"); return 1; }
             //if( recv(socket_desc, server_reply , 16 , 0) < 0) { puts("recv failed"); return 1; }
 
-            //x += F[0];
+            //x += F[1024];
             //printf("sandybridge_i5_2435m_probe\n");
-            prob_time = sandybridge_i5_2435m_probe(); return 0;
+            prob_time = sandybridge_i5_2435m_probe_m2(); printf("\n%lu\n", prob_time); return 0;
 
             //if (prob_time < 360) 
             //    printf("prob_time\t:\t%d\n", prob_time);

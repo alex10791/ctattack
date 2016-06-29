@@ -1022,6 +1022,7 @@ unsigned long int sandybridge_i5_2435m_probe() {
     //printf("sandybridge_i5_2435m_probe\n");
     // PROBE & MEASURE
     unsigned long int begin, end;
+    unsigned long int tt, max = 0;
     //unsigned long int begin2, end2;
     volatile char **tmp1 = init_prime;
     TIMESTAMP_START;
@@ -1029,72 +1030,96 @@ unsigned long int sandybridge_i5_2435m_probe() {
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     TIMESTAMP_START;
     tmp1 = (volatile char **)*tmp1;
     TIMESTAMP_STOP;
     begin = get_global_timestamp_start();
     end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
     printf("%lu\n", end-begin);
     //tmp1 = (volatile char **)*tmp1;
     //tmp1 = (volatile char **)*tmp1;
@@ -1110,5 +1135,409 @@ unsigned long int sandybridge_i5_2435m_probe() {
     begin2 = get_global_timestamp_start();
     end2 = get_global_timestamp_stop();
 */
+    //return (end-begin);//-(end2-begin2);
+    return max;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Sandy Bridge Method 2 : Use as if there is double associativity instead of using cache slice selection hash function
+
+int sandybridge_i5_2435m_cache_slice_from_virt_m2(void* addr) {
+    unsigned long int x = ((unsigned long int*)addr)[0];
+    return sandybridge_i5_2435m_cache_slice_alg_m2((void*)(get_pfn(addr) << 12));
+}
+
+int sandybridge_i5_2435m_cache_slice_alg_m2(void* addr) {
+    //printf("sandybridge_i5_2435m_cache_slice_m2\n");
+    //unsigned long int x = ((unsigned long int*)addr)[0];
+    //unsigned long int i_addr = (unsigned long int) get_pfn(addr);
+    
+    //printf("\n%016p : \n", (void *) addr);
+
+    unsigned long int i_addr = (unsigned long int) addr;
+
+/*
+    printf("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n");
+    printPtr2bin((void *) addr);
+    printf("17:%lu 18:%lu 20:%lu 22:%lu 24:%lu 25:%lu 26:%lu 27:%lu 28:%lu 30:%lu\n", ((i_addr & 0x000020000) >> 17), ((i_addr & 0x000040000) >> 18), 
+                ((i_addr & 0x000100000) >> 20), ((i_addr & 0x000400000) >> 22), ((i_addr & 0x001000000) >> 24), ((i_addr & 0x002000000) >> 25),
+                ((i_addr & 0x004000000) >> 26), ((i_addr & 0x008000000) >> 27), ((i_addr & 0x010000000) >> 28), ((i_addr & 0x040000000) >> 30));
+    printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
+*/
+
+    // According to lackingrhoticity.blogspot.dk/2015/04/l3-cache-mapping-on-sandy-bridge-cpus.html
+    // Intel Core i5 2435M (2 core)
+    int bit0 = ((i_addr & 0x000020000) >> 17) ^ ((i_addr & 0x000040000) >> 18) ^ ((i_addr & 0x000100000) >> 20) ^ ((i_addr & 0x000400000) >> 22) 
+             ^ ((i_addr & 0x001000000) >> 24) ^ ((i_addr & 0x002000000) >> 25) ^ ((i_addr & 0x004000000) >> 26) ^ ((i_addr & 0x008000000) >> 27) 
+             ^ ((i_addr & 0x010000000) >> 28) ^ ((i_addr & 0x040000000) >> 30); // ^ ((i_addr & 0x100000000) >> 32) ^ ((i_addr & 0x200000000) >> 33);
+
+
+    return bit0;
+}
+
+
+// Ivy Bridge i7-3770 FUNCTIONS
+    
+int sandybridge_i5_2435m_setup_m2(unsigned long int monline) {
+    unsigned long int cache_line_check_offset = monline & 0x00001FFFF;
+    size_t mem_length = (size_t)MB(2); 
+    unsigned long int x = 0;
+    //int mem_length_char = ((int)mem_length/sizeof(char));
+    //int mem_length_ptr = (int)mem_length/sizeof(void *);
+
+    B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    C = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+
+    // check if memory was properly allocated
+
+    x += (unsigned long int)B[MB(0)];
+    x += (unsigned long int)C[MB(0)];
+
+    //printf("B : %p\n", (void *)get_pfn(B));
+    //printf("C : %p\n", (void *)get_pfn(C));
+
+    B[(0x00 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x01 << 17)/8 + cache_line_check_offset/8);
+    B[(0x01 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x02 << 17)/8 + cache_line_check_offset/8);
+    B[(0x02 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x03 << 17)/8 + cache_line_check_offset/8);
+    B[(0x03 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x04 << 17)/8 + cache_line_check_offset/8);
+    B[(0x04 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x05 << 17)/8 + cache_line_check_offset/8);
+    B[(0x05 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x06 << 17)/8 + cache_line_check_offset/8);
+    B[(0x06 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x07 << 17)/8 + cache_line_check_offset/8);
+    B[(0x07 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x08 << 17)/8 + cache_line_check_offset/8);
+    
+    B[(0x08 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x09 << 17)/8 + cache_line_check_offset/8);
+    B[(0x09 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x0a << 17)/8 + cache_line_check_offset/8);
+    B[(0x0a << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x0b << 17)/8 + cache_line_check_offset/8);
+    B[(0x0b << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x0c << 17)/8 + cache_line_check_offset/8);
+    B[(0x0c << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x0d << 17)/8 + cache_line_check_offset/8);
+    B[(0x0d << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x0e << 17)/8 + cache_line_check_offset/8);
+    B[(0x0e << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x0f << 17)/8 + cache_line_check_offset/8);
+    B[(0x0f << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x00 << 17)/8 + cache_line_check_offset/8);
+
+    C[(0x00 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x01 << 17)/8 + cache_line_check_offset/8);
+    C[(0x01 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x02 << 17)/8 + cache_line_check_offset/8);
+    C[(0x02 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x03 << 17)/8 + cache_line_check_offset/8);
+    C[(0x03 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x04 << 17)/8 + cache_line_check_offset/8);
+    C[(0x04 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x05 << 17)/8 + cache_line_check_offset/8);
+    C[(0x05 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x06 << 17)/8 + cache_line_check_offset/8);
+    C[(0x06 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x07 << 17)/8 + cache_line_check_offset/8);
+    C[(0x07 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x08 << 17)/8 + cache_line_check_offset/8);
+    
+    C[(0x08 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x09 << 17)/8 + cache_line_check_offset/8);
+    C[(0x09 << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x0a << 17)/8 + cache_line_check_offset/8);
+    C[(0x0a << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x0b << 17)/8 + cache_line_check_offset/8);
+    C[(0x0b << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x0c << 17)/8 + cache_line_check_offset/8);
+    C[(0x0c << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x0d << 17)/8 + cache_line_check_offset/8);
+    C[(0x0d << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x0e << 17)/8 + cache_line_check_offset/8);
+    C[(0x0e << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (0x0f << 17)/8 + cache_line_check_offset/8);
+    C[(0x0f << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (0x00 << 17)/8 + cache_line_check_offset/8);
+
+    if ( ((0x07 << 18) + cache_line_check_offset + KB(32)) < MB(2) ) {
+        
+        B[(0x00 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x01 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x01 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x02 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x02 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x03 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x03 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x04 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x04 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x05 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x05 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x06 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x06 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x07 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x07 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x08 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        
+        B[(0x08 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x09 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x09 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x0a << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x0a << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x0b << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x0b << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x0c << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x0c << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x0d << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x0d << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x0e << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x0e << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x0f << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(0x0f << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x00 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+
+        C[(0x00 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x01 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x01 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x02 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x02 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x03 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x03 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x04 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x04 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x05 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x05 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x06 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x06 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x07 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x07 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x08 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        
+        C[(0x08 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x09 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x09 << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x0a << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x0a << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x0b << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x0b << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x0c << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x0c << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x0d << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x0d << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x0e << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x0e << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (0x0f << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(0x0f << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (0x00 << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+
+        init_reprime = B + cache_line_check_offset/8 + KB(32)/8;
+    } else {
+
+        B[(0x00 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x01 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x01 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x02 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x02 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x03 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x03 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x04 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x04 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x05 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x05 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x06 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x06 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x07 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x07 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x08 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        
+        B[(0x08 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x09 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x09 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x0a << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x0a << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x0b << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x0b << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x0c << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x0c << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x0d << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x0d << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x0e << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x0e << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x0f << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(0x0f << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x00 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+
+        C[(0x00 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x01 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x01 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x02 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x02 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x03 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x03 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x04 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x04 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x05 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x05 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x06 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x06 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x07 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x07 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x08 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        
+        C[(0x08 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x09 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x09 << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x0a << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x0a << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x0b << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x0b << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x0c << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x0c << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x0d << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x0d << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x0e << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x0e << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (0x0f << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(0x0f << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (0x00 << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+
+
+        init_reprime = B + cache_line_check_offset/8 - KB(32)/8;
+    }
+
+
+    init_prime = B + cache_line_check_offset/8;
+    
+
+    return 1;
+}
+
+void sandybridge_i5_2435m_prime_m2() {
+    //printf("sandybridge_i5_2435m_prime_m2\n");
+    TIMESTAMP_START;
+    TIMESTAMP_STOP;
+    TIMESTAMP_START;
+    TIMESTAMP_STOP;
+    volatile char **tmp1 = init_prime;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+}
+
+void sandybridge_i5_2435m_reprime_m2() {
+    //printf("sandybridge_i5_2435m_reprime_m2\n");
+    volatile char **tmp1 = init_reprime;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+}
+
+unsigned long int sandybridge_i5_2435m_probe_m2() {
+    //printf("sandybridge_i5_2435m_probe_m2\n");
+    // PROBE & MEASURE
+    unsigned long int begin, end;
+    unsigned long int tt, max = 0;
+    //unsigned long int begin2, end2;
+    volatile char **tmp1 = init_prime;
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    tmp1 = (volatile char **)*tmp1;
+    /*
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    TIMESTAMP_START;
+    tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    tt = end - begin;
+    if (max < tt) max = tt;
+    printf("%lu\n", end-begin);
+    */
+    //tmp1 = (volatile char **)*tmp1;
+    //tmp1 = (volatile char **)*tmp1;
+    //tmp1 = (volatile char **)*tmp1;
+    //tmp1 = (volatile char **)*tmp1;
+    TIMESTAMP_STOP;
+    begin = get_global_timestamp_start();
+    end = get_global_timestamp_stop();
+    //printf("%lu\n", end-begin);
+/*
+    TIMESTAMP_START;
+    TIMESTAMP_STOP;
+    begin2 = get_global_timestamp_start();
+    end2 = get_global_timestamp_stop();
+*/
     return (end-begin);//-(end2-begin2);
+    //return max;
 }
