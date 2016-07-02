@@ -1,0 +1,31 @@
+
+
+Name				Processor				Method				Server Request 		State						
+-------------------------------------------------------------------------------------------------------------
+data_sb21.csv		sandy bridge (mac)		24-cachelines		Yes					no access/no colision
+data_sb22.csv		sandy bridge (mac)		24-cachelines		Yes					access/colision
+data_sb23.csv		sandy bridge (mac)		24-cachelines		Yes					access/no colision
+
+data_sb24.csv		sandy bridge (mac)		24-cachelines		Yes					no access/no colision
+data_sb25.csv		sandy bridge (mac)		24-cachelines		Yes					access/colision
+data_sb26.csv		sandy bridge (mac)		24-cachelines		Yes					access/no colision
+
+data_sb27.csv		sandy bridge (mac)		24-cachelines		Yes					no access/no colision
+data_sb28.csv		sandy bridge (mac)		24-cachelines		Yes					access/colision
+data_sb29.csv		sandy bridge (mac)		24-cachelines		Yes					access/no colision
+
+data_sb30.csv		sandy bridge (mac)		24-cachelines		Yes					running against server REPS=1000000 CIPHERTEXTS=1
+
+data_sb31.csv		sandy bridge (mac)		24-cachelines		Yes					no access/no colision
+data_sb32.csv		sandy bridge (mac)		24-cachelines		Yes					access/colision
+data_sb33.csv		sandy bridge (mac)		24-cachelines		Yes					access/no colision
+
+data_sb34.csv		sandy bridge (mac)		24-cachelines		No					no access/no colision
+data_sb35.csv		sandy bridge (mac)		24-cachelines		No					access/colision
+data_sb36.csv		sandy bridge (mac)		24-cachelines		No					access/no colision
+
+data_sb37.csv		sandy bridge (mac)		24-cachelines		Yes					no access/no colision
+data_sb38.csv		sandy bridge (mac)		24-cachelines		Yes					access/colision
+data_sb39.csv		sandy bridge (mac)		24-cachelines		Yes					access/no colision
+
+

