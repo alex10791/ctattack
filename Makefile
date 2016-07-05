@@ -96,6 +96,9 @@ masm_cachemon_v4: src/ssa/cachemon_v4.c src/ctattack.c
 sandybridge_i5_2435m_key_recov: src/ssa/sandybridge_i5_2435m_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
 	$(CC) $(CFLAGS) -o bin/sandybridge_i5_2435m_key_recov src/ssa/sandybridge_i5_2435m_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
+haswell_i7_4600_key_recov: src/ssa/haswell_i7_4600_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
+	$(CC) $(CFLAGS) -o bin/haswell_i7_4600_key_recov src/ssa/haswell_i7_4600_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
+
 ivybridge_i7_3770_key_recov: src/ssa/ivybridge_i7_3770_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
 	$(CC) $(CFLAGS) -o bin/ivybridge_i7_3770_key_recov src/ssa/ivybridge_i7_3770_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 

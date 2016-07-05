@@ -268,5 +268,18 @@ void sandybridge_i5_2435m_prime();
 void sandybridge_i5_2435m_reprime();
 unsigned long int sandybridge_i5_2435m_probe();
 
+int sandybridge_i5_2435m_cache_slice_from_virt_m2(void* addr);
+int sandybridge_i5_2435m_cache_slice_alg_2(void* addr);
+int sandybridge_i5_2435m_setup_2(unsigned long int monline);
+void sandybridge_i5_2435m_prime_2();
+void sandybridge_i5_2435m_reprime_2();
+unsigned long int sandybridge_i5_2435m_probe_2();
+
+int haswell_i7_4600m_cache_slice_from_virt(void* addr);
+int haswell_i7_4600m_cache_slice_alg(void* addr);
+int haswell_i7_4600m_setup(unsigned long int monline);
+void haswell_i7_4600m_prime();
+void haswell_i7_4600m_reprime();
+unsigned long int haswell_i7_4600m_probe();
 
 #endif
