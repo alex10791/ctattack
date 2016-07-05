@@ -9,7 +9,7 @@
 
 #include <math.h>
 
-#define EMPIRICAL_CACHE_ACCESS_TIME 750
+#define EMPIRICAL_CACHE_ACCESS_TIME 800
 #define REPS 1
 #define CIPHERTEXTS 20000000
 
