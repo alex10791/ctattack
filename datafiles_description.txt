@@ -29,3 +29,7 @@ data_sb38.csv		sandy bridge (mac)		24-cachelines		Yes					access/colision
 data_sb39.csv		sandy bridge (mac)		24-cachelines		Yes					access/no colision
 
 
+
+data_ib4.csv		ivy bridge (library)	16-cachelines		Yes					no access/no colision
+data_ib5.csv		ivy bridge (library)	16-cachelines		Yes					access/no colision
+data_ib6.csv		ivy bridge (library)	16-cachelines		Yes					access/colision

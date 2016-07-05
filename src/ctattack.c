@@ -372,7 +372,7 @@ int ivybridge_i7_3770_cache_slice_alg(void* addr) {
     printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
 */
 
-/*
+
     // According to Systematic Reverse Engineering of Cache Slice Selection in Intel Processors
     // Intel i7-4702M Haswell (4 cores)
     // Intel Xeon E5-2609 v2 Ivy Bridge (4 cores)
@@ -383,8 +383,8 @@ int ivybridge_i7_3770_cache_slice_alg(void* addr) {
     int bit1 = ((i_addr & 0x000040000) >> 18) ^ ((i_addr & 0x000080000) >> 19) ^ ((i_addr & 0x000200000) >> 21) ^ ((i_addr & 0x000800000) >> 23) 
              ^ ((i_addr & 0x002000000) >> 25) ^ ((i_addr & 0x008000000) >> 27) ^ ((i_addr & 0x020000000) >> 29) ^ ((i_addr & 0x040000000) >> 30) 
              ^ ((i_addr & 0x080000000) >> 31) ^ ((i_addr & 0x100000000) >> 32);
-*/
 
+/*
     // According to Reverse Engineering Intel Last-Level Cache Complex Addressing Using Performace Counters
     // Xeon & Core (4 core - from bit 17 and above)
     int bit0 = ((i_addr & 0x000020000) >> 17) ^ ((i_addr & 0x000040000) >> 18) ^ ((i_addr & 0x000100000) >> 20) ^ ((i_addr & 0x000400000) >> 22) 
@@ -395,7 +395,7 @@ int ivybridge_i7_3770_cache_slice_alg(void* addr) {
              ^ ((i_addr & 0x000400000) >> 22) ^ ((i_addr & 0x000800000) >> 23) ^ ((i_addr & 0x001000000) >> 24) ^ ((i_addr & 0x004000000) >> 26) 
              ^ ((i_addr & 0x010000000) >> 28) ^ ((i_addr & 0x020000000) >> 29) ^ ((i_addr & 0x080000000) >> 31) ^ ((i_addr & 0x200000000) >> 33)
              ^ ((i_addr & 0x400000000) >> 34);
-
+*/
 
     return ((bit1 << 1) | bit0);
 }

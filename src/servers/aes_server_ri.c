@@ -30,6 +30,8 @@
 #define AES_BLOCK_SIZE_BYTES 16
 #define AES_BLOCK_SIZE_BITS 128
 
+//#define CONTROLED_ACCESS
+
 static const unsigned char key[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
@@ -58,6 +60,14 @@ int main(int argc, char* argv[])
     printf("PHY PTR Te2: %p\n", (void *)(((unsigned long int)get_phy_addr_TeN(2) << 12) | ((unsigned long int)get_virt_addr_TeN(2) & 0xFFF)));
     printf("PHY PTR Te3: %p\n", (void *)(((unsigned long int)get_phy_addr_TeN(3) << 12) | ((unsigned long int)get_virt_addr_TeN(3) & 0xFFF)));
     printf("PHY PTR Te4: %p\n", (void *)(((unsigned long int)get_phy_addr_TeN(4) << 12) | ((unsigned long int)get_virt_addr_TeN(4) & 0xFFF)));
+
+#ifdef CONTROLED_ACCESS
+    volatile unsigned long int x = 0;
+    size_t mem_length = (size_t)MB(2);
+    volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    B[2048] = 0xAA;
+    printf("PHY PTR B: %p\n", (void *)(get_pfn((void *)B) << 12));
+#endif
 
     if (argc != 2) {
         printf("[!]Usage: %s PORT\n", argv[0]);
@@ -101,12 +111,6 @@ int main(int argc, char* argv[])
     //Accept and incoming connection
     printf("Waiting for incoming connections...\n");
     c = sizeof(struct sockaddr_in);
-
-
-    volatile unsigned long int x = 0;
-    size_t mem_length = (size_t)MB(2);
-    volatile char *B = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
-    B[2048] = 0xAA;
 
 
     while ((new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c))) {
@@ -174,6 +178,9 @@ int main(int argc, char* argv[])
 
         //x += (get_TeN_idx(4, 0) & (0xFF<<8)) >> 8;
 
+#ifdef CONTROLED_ACCESS
+        x += B[0];
+#endif
 //        printf("ENCRYPTION\n");
         rijndaelEncrypt((const u32*)enc_key, (int)10, (const u8*)text, (u8*)enc_out);
 
