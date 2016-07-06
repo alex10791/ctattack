@@ -99,9 +99,6 @@ sandybridge_i5_2435m_key_recov: src/ssa/sandybridge_i5_2435m_key_recov.c src/cta
 haswell_i7_4600_key_recov: src/ssa/haswell_i7_4600_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
 	$(CC) $(CFLAGS) -o bin/haswell_i7_4600_key_recov src/ssa/haswell_i7_4600_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 
-skylake_i7_6700_key_recov: src/ssa/skylake_i7_6700_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
-	$(CC) $(CFLAGS) -o bin/skylake_i7_6700_key_recov src/ssa/skylake_i7_6700_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
-
 ivybridge_i7_3770_key_recov: src/ssa/ivybridge_i7_3770_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c
 	$(CC) $(CFLAGS) -o bin/ivybridge_i7_3770_key_recov src/ssa/ivybridge_i7_3770_key_recov.c src/ctattack.c openssl_aes_ref_impl/rijndael-alg-fst.c -O0 $(CHEADER_DIR) $(CLIBDIR) $(CLIBS)
 

