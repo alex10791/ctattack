@@ -181,7 +181,7 @@
 
 #define ROBOSTNESS_LOOP 10000 //1000000000
 #define CACHE_L3_THRESHOLD 800000 //800000
-
+#define HUGE_PAGES_AVAILBLE 512
 
 // MARCROS
 
@@ -245,6 +245,12 @@ volatile char **B;
 volatile char **C;
 volatile char **D;
 volatile char **E;
+
+volatile char **F;
+volatile char **G;
+volatile char **H;
+volatile char **I;
+
 volatile char **init_prime;
 volatile char **init_reprime;
 

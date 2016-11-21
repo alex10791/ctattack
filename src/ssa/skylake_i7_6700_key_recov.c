@@ -9,7 +9,7 @@
 
 #include <math.h>
 
-#define EMPIRICAL_CACHE_ACCESS_TIME 650 //1000
+#define EMPIRICAL_CACHE_ACCESS_TIME 950 //1000
 #define REPS 1
 #define CIPHERTEXTS 20000000	//100000	//
 
@@ -33,8 +33,8 @@ int main(int argc, char* argv[])
     volatile char *F = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
     F[2048] = 0xAA;
 
-    if (!skylake_i7_6700_setup(0x1d667da80)) {      //0x119c00000
-        printf("[x] Not enough memory could be allocated on required cache-slice, please try again and/or increase hugepages available memory");
+    if (!skylake_i7_6700_setup(0x37ee30500)) {      //0x119c00000
+        printf("[x] Not enough memory could be allocated on required cache-slice, please try again and/or increase hugepages available memory\n");
         return 0;
     }
     

@@ -5,7 +5,6 @@
 #include "inttypes.h"
 #define PAGEMAP_LENGTH 8
 
-
 // IMPLEMENTATION
 
 unsigned int timestamp_weak(void) {
@@ -1938,17 +1937,59 @@ int skylake_i7_6700_cache_slice_alg(void* addr) {
 
     // According to Reverse Engineering Intel Last-Level Cache Complex Addressing Using Performace Counters
     // Xeon & Core (4 core - from bit 17 and above)
-    int bit0 = ((i_addr & 0x000020000) >> 17) ^ ((i_addr & 0x000040000) >> 18) ^ ((i_addr & 0x000100000) >> 20) ^ ((i_addr & 0x000400000) >> 22) 
-             ^ ((i_addr & 0x001000000) >> 24) ^ ((i_addr & 0x002000000) >> 25) ^ ((i_addr & 0x004000000) >> 26) ^ ((i_addr & 0x008000000) >> 27) 
-             ^ ((i_addr & 0x010000000) >> 28) ^ ((i_addr & 0x040000000) >> 30) ^ ((i_addr & 0x100000000) >> 32) ^ ((i_addr & 0x200000000) >> 33);
+//    int bit0 = ((i_addr & 0x000020000) >> 17) ^ ((i_addr & 0x000040000) >> 18) ^ ((i_addr & 0x000100000) >> 20) ^ ((i_addr & 0x000400000) >> 22) 
+//             ^ ((i_addr & 0x001000000) >> 24) ^ ((i_addr & 0x002000000) >> 25) ^ ((i_addr & 0x004000000) >> 26) ^ ((i_addr & 0x008000000) >> 27) 
+//             ^ ((i_addr & 0x010000000) >> 28) ^ ((i_addr & 0x040000000) >> 30) ^ ((i_addr & 0x100000000) >> 32) ^ ((i_addr & 0x200000000) >> 33);
 
-    int bit1 = ((i_addr & 0x000020000) >> 17) ^ ((i_addr & 0x000080000) >> 19) ^ ((i_addr & 0x000100000) >> 20) ^ ((i_addr & 0x000200000) >> 21)
-             ^ ((i_addr & 0x000400000) >> 22) ^ ((i_addr & 0x000800000) >> 23) ^ ((i_addr & 0x001000000) >> 24) ^ ((i_addr & 0x004000000) >> 26) 
-             ^ ((i_addr & 0x010000000) >> 28) ^ ((i_addr & 0x020000000) >> 29) ^ ((i_addr & 0x080000000) >> 31) ^ ((i_addr & 0x200000000) >> 33)
-             ^ ((i_addr & 0x400000000) >> 34);
+//    int bit1 = ((i_addr & 0x000020000) >> 17) ^ ((i_addr & 0x000080000) >> 19) ^ ((i_addr & 0x000100000) >> 20) ^ ((i_addr & 0x000200000) >> 21)
+//             ^ ((i_addr & 0x000400000) >> 22) ^ ((i_addr & 0x000800000) >> 23) ^ ((i_addr & 0x001000000) >> 24) ^ ((i_addr & 0x004000000) >> 26) 
+//             ^ ((i_addr & 0x010000000) >> 28) ^ ((i_addr & 0x020000000) >> 29) ^ ((i_addr & 0x080000000) >> 31) ^ ((i_addr & 0x200000000) >> 33)
+//             ^ ((i_addr & 0x400000000) >> 34);
 
 
-    return ((bit1 << 1) | bit0);
+//    return ((bit1 << 1) | bit0);
+
+    // Label Bit 0
+    // Solution 1
+    int bit0 = ((i_addr & 0x000020000) >> 17) ^ ((i_addr & 0x000040000) >> 18) ^ ((i_addr & 0x000080000) >> 19) ^ ((i_addr & 0x000100000) >> 20)
+             ^ ((i_addr & 0x000800000) >> 23) ^ ((i_addr & 0x001000000) >> 24) ^ ((i_addr & 0x002000000) >> 25) ^ ((i_addr & 0x010000000) >> 28)
+             ^ ((i_addr & 0x080000000) >> 31) ^ ((i_addr & 0x100000000) >> 32);
+
+    // Solution 2
+    int bit1 = ((i_addr & 0x000020000) >> 17) ^ ((i_addr & 0x000100000) >> 20) ^ ((i_addr & 0x000200000) >> 21) ^ ((i_addr & 0x001000000) >> 24)
+             ^ ((i_addr & 0x008000000) >> 27) ^ ((i_addr & 0x010000000) >> 28) ^ ((i_addr & 0x020000000) >> 29) ^ ((i_addr & 0x040000000) >> 30);
+
+    // Solution 3
+    int bit2 = ((i_addr & 0x000040000) >> 18) ^ ((i_addr & 0x000080000) >> 19) ^ ((i_addr & 0x000200000) >> 21) ^ ((i_addr & 0x000800000) >> 23)
+             ^ ((i_addr & 0x002000000) >> 25) ^ ((i_addr & 0x008000000) >> 27) ^ ((i_addr & 0x020000000) >> 29) ^ ((i_addr & 0x040000000) >> 30)
+             ^ ((i_addr & 0x080000000) >> 31) ^ ((i_addr & 0x100000000) >> 32);
+
+
+    // Label Bit 1
+    // Solution 1
+    int bit3 = ((i_addr & 0x000080000) >> 19) ^ ((i_addr & 0x000400000) >> 22) ^ ((i_addr & 0x000800000) >> 23) ^ ((i_addr & 0x004000000) >> 26)
+             ^ ((i_addr & 0x008000000) >> 27) ^ ((i_addr & 0x040000000) >> 30) ^ ((i_addr & 0x080000000) >> 31);
+
+    // Solution 2
+    int bit4 = ((i_addr & 0x000020000) >> 17) ^ ((i_addr & 0x000040000) >> 18) ^ ((i_addr & 0x000100000) >> 20) ^ ((i_addr & 0x000400000) >> 22)
+             ^ ((i_addr & 0x001000000) >> 24) ^ ((i_addr & 0x002000000) >> 25) ^ ((i_addr & 0x004000000) >> 26) ^ ((i_addr & 0x008000000) >> 27)
+             ^ ((i_addr & 0x010000000) >> 28) ^ ((i_addr & 0x040000000) >> 30) ^ ((i_addr & 0x100000000) >> 32);
+
+    // Solution 3
+    int bit5 = ((i_addr & 0x000020000) >> 17) ^ ((i_addr & 0x000080000) >> 19) ^ ((i_addr & 0x000100000) >> 20) ^ ((i_addr & 0x000200000) >> 21)
+             ^ ((i_addr & 0x000400000) >> 22) ^ ((i_addr & 0x000800000) >> 23) ^ ((i_addr & 0x001000000) >> 24) ^ ((i_addr & 0x004000000) >> 26)
+             ^ ((i_addr & 0x010000000) >> 28) ^ ((i_addr & 0x020000000) >> 29) ^ ((i_addr & 0x080000000) >> 31);
+
+    // Solution 4
+    int bit6 = ((i_addr & 0x000040000) >> 18) ^ ((i_addr & 0x000200000) >> 21) ^ ((i_addr & 0x000400000) >> 22) ^ ((i_addr & 0x002000000) >> 25)
+             ^ ((i_addr & 0x004000000) >> 26) ^ ((i_addr & 0x020000000) >> 29) ^ ((i_addr & 0x100000000) >> 32);
+
+
+
+//    return ((bit6 << 6) | (bit5 << 5) | (bit4 << 4) | (bit3 << 3) | (bit2 << 2) | (bit1 << 1) | bit0);
+    return ((bit3 << 2) | (bit1 << 1) | bit0);
+
+
 }
 
 
@@ -1971,38 +2012,47 @@ int skylake_i7_6700_setup(unsigned long int monline) {
     int monline_cache_slice = skylake_i7_6700_cache_slice_alg((void *) monline);
     printf("monline_cache_slice\t:\t%d\n", monline_cache_slice);
 
-    void *tmp[128];
+    void *tmp[HUGE_PAGES_AVAILBLE];
     int B_idx = -1;
     int C_idx = -1;
     int D_idx = -1;
     int E_idx = -1;
+    int F_idx = -1;
+    int G_idx = -1;
+    int H_idx = -1;
+    int I_idx = -1;
 
     int cache_slice_pattern[4][4];
 
     cache_slice_pattern[0][0] = 0x0;
-    cache_slice_pattern[0][1] = 0x7;
-    cache_slice_pattern[0][2] = 0x9;
-    cache_slice_pattern[0][3] = 0xe;
+    cache_slice_pattern[0][1] = 0x9;
 
-    cache_slice_pattern[3][0] = 0x8;
-    cache_slice_pattern[3][1] = 0x6;
-    cache_slice_pattern[3][2] = 0x1;
-    cache_slice_pattern[3][3] = 0xf;
+    cache_slice_pattern[1][0] = 0x2;
+    cache_slice_pattern[1][1] = 0xb;
 
-    cache_slice_pattern[2][0] = 0x4;
+    cache_slice_pattern[2][0] = 0x3;
     cache_slice_pattern[2][1] = 0xa;
-    cache_slice_pattern[2][2] = 0xd;
-    cache_slice_pattern[2][3] = 0x3;
 
-    cache_slice_pattern[1][0] = 0xc;
-    cache_slice_pattern[1][1] = 0x2;
-    cache_slice_pattern[1][2] = 0x5;
-    cache_slice_pattern[1][3] = 0xb;
+    cache_slice_pattern[3][0] = 0x1;
+    cache_slice_pattern[3][1] = 0x8;
+
+    cache_slice_pattern[4][0] = 0x6;
+    cache_slice_pattern[4][1] = 0xf;
+
+    cache_slice_pattern[5][0] = 0x4;
+    cache_slice_pattern[5][1] = 0xd;
+
+    cache_slice_pattern[6][0] = 0x5;
+    cache_slice_pattern[6][1] = 0xc;
+
+    cache_slice_pattern[7][0] = 0x7;
+    cache_slice_pattern[7][1] = 0xe;
 
 
-    for (i = 0; i < 128; ++i) tmp[i] = NULL;
 
-    for (i = 0; i < 128; ++i) {
+    for (i = 0; i < HUGE_PAGES_AVAILBLE; ++i) tmp[i] = NULL;
+
+    for (i = 0; i < HUGE_PAGES_AVAILBLE; ++i) {
         tmp[i] = mmap(NULL, mem_length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
         printf("skylake_i7_6700_cache_slice_from_virt(tmp[i])\t:\t%d\n", skylake_i7_6700_cache_slice_from_virt(tmp[i]));
         //x += (unsigned long int)(*((unsigned int)tmp[i]));
@@ -2025,6 +2075,26 @@ int skylake_i7_6700_setup(unsigned long int monline) {
             if (E_idx == -1) {
                 E = tmp[i];
                 E_idx = i;
+                continue;
+            }
+            if (F_idx == -1) {
+                F = tmp[i];
+                F_idx = i;
+                continue;
+            }
+            if (G_idx == -1) {
+                G = tmp[i];
+                G_idx = i;
+                continue;
+            }
+            if (H_idx == -1) {
+                H = tmp[i];
+                H_idx = i;
+                continue;
+            }
+            if (I_idx == -1) {
+                I = tmp[i];
+                I_idx = i;
                 break;
             }
         }
@@ -2034,13 +2104,17 @@ int skylake_i7_6700_setup(unsigned long int monline) {
     printf("C_idx\t:\t%d\n", C_idx);
     printf("D_idx\t:\t%d\n", D_idx);
     printf("E_idx\t:\t%d\n", E_idx);
+    printf("F_idx\t:\t%d\n", F_idx);
+    printf("G_idx\t:\t%d\n", G_idx);
+    printf("H_idx\t:\t%d\n", H_idx);
+    printf("I_idx\t:\t%d\n", I_idx);
 
-    if (B_idx == -1 || C_idx == -1 || D_idx == -1 || E_idx == -1) return 0;
+    if (B_idx == -1 || C_idx == -1 || D_idx == -1 || E_idx == -1 || F_idx == -1 || G_idx == -1 || H_idx == -1 || I_idx == -1) return 0;
 
     // THIS FOR LOOP NEEDS REVISION (is munmap((void *) addr, size_t length) relieasing the hugepage as expected?)
-    for (i = 0; i < 128; ++i) {
+    for (i = 0; i < HUGE_PAGES_AVAILBLE; ++i) {
         //printf("i\t:\t%d\n", i);
-        if (i != B_idx && i != C_idx && i != D_idx && i != E_idx && tmp[i] != NULL) {
+        if (i != B_idx && i != C_idx && i != D_idx && i != E_idx && i != F_idx && i != G_idx && i != H_idx && i != I_idx && tmp[i] != NULL) {
             munmap(tmp[i], MB(2));
         }
     }
@@ -2056,77 +2130,94 @@ int skylake_i7_6700_setup(unsigned long int monline) {
     x += (unsigned long int)C[MB(0)];
     x += (unsigned long int)D[MB(0)];
     x += (unsigned long int)E[MB(0)];
+    x += (unsigned long int)F[MB(0)];
+    x += (unsigned long int)G[MB(0)];
+    x += (unsigned long int)H[MB(0)];
+    x += (unsigned long int)I[MB(0)];
 
     //printf("B : %p\n", (void *)get_pfn(B));
     //printf("C : %p\n", (void *)get_pfn(C));
 
 
     B[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8);
-    B[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8);
-    B[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8);
-    B[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
+    B[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
 
     C[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8);
-    C[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8);
-    C[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8);
-    C[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
+    C[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
 
     D[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8);
-    D[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8);
-    D[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8);
-    D[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
+    D[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
 
     E[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8);
-    E[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8);
-    E[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8);
-    E[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
+    E[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(F + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
+
+    F[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(F + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8);
+    F[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(G + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
+
+    G[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(G + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8);
+    G[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(H + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
+
+    H[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(H + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8);
+    H[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(I + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
+
+    I[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(I + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8);
+    I[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8);
 
 
 
 
     if ( ((cache_slice_pattern[monline_cache_slice][3] << 17) + cache_line_check_offset + KB(32)) < MB(2) ) {
         B[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        B[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        B[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        B[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
 
         C[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        C[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        C[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        C[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
 
         D[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        D[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        D[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        D[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        D[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
 
         E[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        E[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        E[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
-        E[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        E[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(F + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+
+        F[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(F + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        F[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(G + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+
+        G[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(G + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        G[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(H + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+
+        H[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(H + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        H[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(I + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+
+        I[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(I + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
+        I[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 + KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8);
 
 
         init_reprime = B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 + KB(32)/8;
     } else {
         B[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        B[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        B[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        B[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        B[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
 
         C[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        C[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        C[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(C + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        C[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        C[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
 
         D[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        D[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        D[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(D + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        D[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        D[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
 
         E[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        E[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        E[(cache_slice_pattern[monline_cache_slice][2] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(E + (cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
-        E[(cache_slice_pattern[monline_cache_slice][3] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        E[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(F + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+
+        F[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(F + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        F[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(G + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+
+        G[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(G + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        G[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(H + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+
+        H[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(H + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        H[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(I + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+
+        I[(cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(I + (cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+        I[(cache_slice_pattern[monline_cache_slice][1] << 17)/8 + cache_line_check_offset/8 - KB(32)/8] = (volatile char *)(B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8);
+
 
         init_reprime = B + (cache_slice_pattern[monline_cache_slice][0] << 17)/8 + cache_line_check_offset/8 - KB(32)/8;
     }
